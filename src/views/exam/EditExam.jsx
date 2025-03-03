@@ -32,7 +32,7 @@ const topicCategories = [
   { id: 4, name: 'Microsoft' },
 ]
 
-function AddExam() {
+function EditExam() {
   const [dataExam, setDataExam] = useState([])
 
   const [questions, setQuestions] = useState([
@@ -645,4 +645,4 @@ function AddExam() {
   )
 }
 
-export default AddExam
+export default EditExam

@@ -15,8 +15,8 @@ const DefaultLayout = () => {
       <ScrollUpButton />
       <ToastContainer
         position="top-center"
-        autoClose={2500}
-        hideProgressBar={false}
+        autoClose={false}
+        hideProgressBar={true}
         newestOnTop={false}
         closeOnClick
         rtl={false}

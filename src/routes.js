@@ -17,6 +17,7 @@ const AdminLog = React.lazy(() => import('./views/admin/AdminLog'))
 
 // TAB BÀI THI
 const AddExam = React.lazy(() => import('./views/exam/AddExam'))
+const EditExam = React.lazy(() => import('./views/exam/EditExam'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -32,6 +33,7 @@ const routes = [
   { path: '/admin/log', name: 'AdminLog', element: AdminLog },
 
   { path: '/exams/add', name: 'AddExam', element: AddExam, exact: true },
+  { path: '/exams/edit', name: 'AddExam', element: EditExam, exact: true },
 ]
 
 export default routes
