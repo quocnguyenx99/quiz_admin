@@ -15,10 +15,8 @@ const AdminLog = React.lazy(() => import('./views/admin/AdminLog'))
 // const PermissionGroup = React.lazy(() => import('./views/admin/PermissionGroup'))
 // const EditPermission = React.lazy(() => import('./views/admin/EditPermissions'))
 
-// process tab
-const ProcessList = React.lazy(() => import('./views/process/ProcessList'))
-
-// customer tab
+// TAB BÀI THI
+const AddExam = React.lazy(() => import('./views/exam/AddExam'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -32,6 +30,8 @@ const routes = [
   { path: '/admin/information', name: 'AdminInfo', element: AdminInfo },
   { path: '/admin/listAdmin', name: 'AdminList', element: AdminList },
   { path: '/admin/log', name: 'AdminLog', element: AdminLog },
+
+  { path: '/exams/add', name: 'AddExam', element: AddExam, exact: true },
 ]
 
 export default routes

@@ -1,0 +1,46 @@
+@import '../../../scss/variables';
+
+.answer {
+  &__modal {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    width: 150px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+
+    &-btn {
+      display: block;
+      padding: 5px 10px;
+      width: 100%;
+      text-align: left;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+  }
+  &__option-letter {
+    width: 32px;
+    aspect-ratio: 1;
+    border: 1px solid $blue-color;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__option-text {
+    width: 100%;
+    textarea {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    textarea:focus {
+      outline: 1px solid $blue-color;
+      border: none;
+    }
+  }
+}

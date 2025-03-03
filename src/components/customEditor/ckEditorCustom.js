@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useRef } from 'react'
 import { CKEditor } from 'ckeditor4-react'
 
-function CKedtiorCustom({ data, onChangeData }) {
+function CKedtiorCustom({ data, onChangeData, height }) {
   const editorInstance = useRef(null)
 
   useEffect(() => {
@@ -13,6 +13,7 @@ function CKedtiorCustom({ data, onChangeData }) {
     <CKEditor
       config={{
         versionCheck: false,
+        height: height,
         extraPlugins: 'justify',
         filebrowserBrowseUrl: 'https://admin.chinhnhan.net/ckfinder/ckfinder.html',
         filebrowserImageBrowseUrl: 'https://admin.chinhnhan.net/ckfinder/ckfinder.html?type=Images',

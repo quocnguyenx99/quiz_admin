@@ -95,7 +95,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Quản lý kết quả thi',
-        to: '/exams/add',
+        to: '/exams/result',
       },
     ],
   },
