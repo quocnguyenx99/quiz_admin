@@ -33,7 +33,7 @@ const DeletedModal = ({ onDelete, visible, setVisible }) => {
           <CButton color="secondary" onClick={() => setVisible(false)}>
             Hủy
           </CButton>
-          <CButton onClick={handleConfirmDelete} color="danger">
+          <CButton style={{ color: 'white' }} onClick={handleConfirmDelete} color="danger">
             Xác nhận
           </CButton>
         </CModalFooter>

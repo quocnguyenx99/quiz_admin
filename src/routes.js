@@ -16,6 +16,7 @@ const AdminLog = React.lazy(() => import('./views/admin/AdminLog'))
 // const EditPermission = React.lazy(() => import('./views/admin/EditPermissions'))
 
 // TAB BÀI THI
+const ExamsList = React.lazy(() => import('./views/exam/ExamsList'))
 const AddExam = React.lazy(() => import('./views/exam/AddExam'))
 const EditExam = React.lazy(() => import('./views/exam/EditExam'))
 
@@ -29,9 +30,10 @@ const routes = [
 
   { path: '/admin', name: 'Admin', element: AdminInfo, exact: true },
   { path: '/admin/information', name: 'AdminInfo', element: AdminInfo },
-  { path: '/admin/listAdmin', name: 'AdminList', element: AdminList },
+  { path: '/admin/adminList', name: 'AdminList', element: AdminList },
   { path: '/admin/log', name: 'AdminLog', element: AdminLog },
 
+  { path: '/exams/examsList', name: 'AddExam', element: ExamsList, exact: true },
   { path: '/exams/add', name: 'AddExam', element: AddExam, exact: true },
   { path: '/exams/edit', name: 'AddExam', element: EditExam, exact: true },
 ]

@@ -23,13 +23,44 @@ import { CKEditor } from 'ckeditor4-react'
 import './style/addExam.scss'
 import CIcon from '@coreui/icons-react'
 import { cilLibraryAdd } from '@coreui/icons'
-import { duration } from 'moment'
 
 const topicCategories = [
-  { id: 1, name: 'DELL' },
-  { id: 2, name: 'ASUS' },
-  { id: 3, name: 'HP' },
-  { id: 4, name: 'Microsoft' },
+  {
+    id: 1,
+    name: 'DELL',
+    theories: [
+      { id: 101, name: 'Bài thi 1 - DELL' },
+      { id: 102, name: 'Bài thi 2 - DELL' },
+      { id: 103, name: 'Bài thi 3 - DELL' },
+    ],
+  },
+  {
+    id: 2,
+    name: 'ASUS',
+    theories: [
+      { id: 201, name: 'Bài thi 1 - ASUS' },
+      { id: 202, name: 'Bài thi 2 - ASUS' },
+      { id: 203, name: 'Bài thi 3 - ASUS' },
+    ],
+  },
+  {
+    id: 3,
+    name: 'HP',
+    theories: [
+      { id: 301, name: 'Bài thi 1 - HP' },
+      { id: 302, name: 'Bài thi 2 - HP' },
+      { id: 303, name: 'Bài thi 3 - HP' },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Microsoft',
+    children: [
+      { id: 401, name: 'Bài thi 1 - Microsoft' },
+      { id: 402, name: 'Bài thi 2 - Microsoft' },
+      { id: 403, name: 'Bài thi 3 - Microsoft' },
+    ],
+  },
 ]
 
 function EditExam() {
@@ -75,7 +106,6 @@ function EditExam() {
       .max(60, 'Tiêu đề trang không được vượt quá 100 ký tự'),
     metaKeyword: Yup.string()
       .required('Meta keywords là bắt buộc')
-      .min(100, 'Meta keywords phải có ít nhất 100 ký tự')
       .max(150, 'Meta keywords không được vượt quá 150 ký tự'),
     metaDesc: Yup.string()
       .required('Meta description là bắt buộc')
@@ -166,7 +196,7 @@ function EditExam() {
     })
   }
 
-  // Xoá đáp án (nếu cần)
+  // Xoá đáp án
   const handleRemoveAnswer = (qIndex, aIndex) => {
     setQuestions((prev) => {
       const newQs = [...prev]
@@ -188,10 +218,9 @@ function EditExam() {
   const handleCheckCorrect = (qIndex, aIndex) => {
     setQuestions((prev) => {
       const newQs = [...prev]
-      newQs[qIndex].answers = newQs[qIndex].answers.map((ans, i) => ({
-        ...ans,
-        is_correct: i === aIndex, // Đánh dấu chỉ 1 câu đúng
-      }))
+      newQs[qIndex].answers = newQs[qIndex].answers.map((ans, i) =>
+        i === aIndex ? { ...ans, is_correct: !ans.is_correct } : ans,
+      )
       return newQs
     })
   }
@@ -226,7 +255,7 @@ function EditExam() {
 
     try {
       setIsLoading(true)
-      const response = await axiosClient.post('admin/exam', {
+      const response = await axiosClient.put('admin/exam', {
         title: values.title,
         friendly_url: values.friendlyUrl,
         friendly_title: values.pageTitle,
@@ -238,13 +267,13 @@ function EditExam() {
         display: values.visible,
       })
       if (response.data.status === true) {
-        toast.success('Bài thi đã được thêm mới!')
+        toast.success('Bài thi đã được cập nhật!')
       }
       if (response.data.status === false && response.data.mess == 'no permission') {
         toast.warn('Bạn không có quyền thực hiện tác vụ này!')
       }
     } catch (error) {
-      console.error('Post data exam is error', error)
+      console.error('Put data exam is error', error)
       toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
     } finally {
       setIsLoading(false)
@@ -286,11 +315,11 @@ function EditExam() {
     <CContainer>
       <CRow className="mb-3">
         <CCol>
-          <h2>THÊM MỚI BÀI THI</h2>
+          <h2>CHỈNH SỬA BÀI THI</h2>
         </CCol>
         <CCol md={6}>
           <div className="d-flex justify-content-end">
-            <Link to={'/exams/add'}>
+            <Link to={'/exams/examsList'}>
               <CButton color="primary" type="button" size="sm">
                 Danh sách
               </CButton>
@@ -306,7 +335,7 @@ function EditExam() {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ setValues }) => {
+            {({ setValues, values, setFieldValue }) => {
               return (
                 <Form>
                   <CRow>
@@ -381,6 +410,9 @@ function EditExam() {
                                   </div>
                                   <div className="answer__option-text">
                                     <CFormTextarea
+                                      style={{
+                                        fontSize: 14,
+                                      }}
                                       className="w-100"
                                       type="text"
                                       value={ans.option_text}
@@ -424,7 +456,9 @@ function EditExam() {
                                             closeMenu()
                                           }}
                                         >
-                                          ✅ Chọn đúng
+                                          {questions[qIndex].answers[aIndex].is_correct
+                                            ? '❌ Bỏ chọn'
+                                            : '✅ Chọn đúng'}
                                         </CButton>
                                       </div>
                                     )}
@@ -534,7 +568,7 @@ function EditExam() {
                     <CCol md={4}>
                       <CCol
                         md={12}
-                        className="border bg-white rounded p-2 overflow-scroll"
+                        className="border bg-white rounded p-2"
                         style={{ height: 'auto' }}
                       >
                         <label
@@ -572,6 +606,45 @@ function EditExam() {
                       </CCol>
                       <br />
 
+                      {values.topicCategory && (
+                        <CCol
+                          md={12}
+                          className="border bg-white rounded p-2"
+                          style={{ height: 'auto' }}
+                        >
+                          <label
+                            className="pb-2 mb-2 w-100"
+                            style={{
+                              fontWeight: 500,
+                              fontSize: 16,
+                              borderBottom: '1px solid #ddd',
+                            }}
+                            htmlFor="exam-select"
+                          >
+                            Bài thi
+                          </label>
+
+                          <Field
+                            className="component-size"
+                            name="exam"
+                            as={CFormSelect}
+                            id="exam-select"
+                            text="Lựa chọn bài thi."
+                          >
+                            <option value="">Chọn bài thi</option>
+                            {topicCategories
+                              .filter((topic) => topic.id == values.topicCategory)[0]
+                              .theories.map((exam) => (
+                                <option key={exam.id} value={exam.id}>
+                                  {exam.name}
+                                </option>
+                              ))}
+                          </Field>
+                          <ErrorMessage name="exam" component="div" className="text-danger" />
+                        </CCol>
+                      )}
+                      <br />
+
                       <CCol md={12}>
                         <label htmlFor="duration-input">Thời gian làm bài</label>
                         <Field
@@ -601,7 +674,7 @@ function EditExam() {
                           {Array.isArray(file) &&
                             file.length > 0 &&
                             file.map((item, index) => (
-                              <CImage className="border w-100" key={index} src={item} />
+                              <CImage className="border" width={200} key={index} src={item} />
                             ))}
                         </div>
                       </CCol>

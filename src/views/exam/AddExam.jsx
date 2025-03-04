@@ -23,13 +23,44 @@ import { CKEditor } from 'ckeditor4-react'
 import './style/addExam.scss'
 import CIcon from '@coreui/icons-react'
 import { cilLibraryAdd } from '@coreui/icons'
-import { duration } from 'moment'
 
 const topicCategories = [
-  { id: 1, name: 'DELL' },
-  { id: 2, name: 'ASUS' },
-  { id: 3, name: 'HP' },
-  { id: 4, name: 'Microsoft' },
+  {
+    id: 1,
+    name: 'DELL',
+    theories: [
+      { id: 101, name: 'Bài thi 1 - DELL' },
+      { id: 102, name: 'Bài thi 2 - DELL' },
+      { id: 103, name: 'Bài thi 3 - DELL' },
+    ],
+  },
+  {
+    id: 2,
+    name: 'ASUS',
+    theories: [
+      { id: 201, name: 'Bài thi 1 - ASUS' },
+      { id: 202, name: 'Bài thi 2 - ASUS' },
+      { id: 203, name: 'Bài thi 3 - ASUS' },
+    ],
+  },
+  {
+    id: 3,
+    name: 'HP',
+    theories: [
+      { id: 301, name: 'Bài thi 1 - HP' },
+      { id: 302, name: 'Bài thi 2 - HP' },
+      { id: 303, name: 'Bài thi 3 - HP' },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Microsoft',
+    children: [
+      { id: 401, name: 'Bài thi 1 - Microsoft' },
+      { id: 402, name: 'Bài thi 2 - Microsoft' },
+      { id: 403, name: 'Bài thi 3 - Microsoft' },
+    ],
+  },
 ]
 
 function AddExam() {
@@ -56,6 +87,7 @@ function AddExam() {
     metaKeyword: '',
     metaDesc: '',
     topicCategory: '',
+    exam: '',
     duration: '',
     visible: 0,
   }
@@ -75,12 +107,12 @@ function AddExam() {
       .max(60, 'Tiêu đề trang không được vượt quá 100 ký tự'),
     metaKeyword: Yup.string()
       .required('Meta keywords là bắt buộc')
-      .min(100, 'Meta keywords phải có ít nhất 100 ký tự')
       .max(150, 'Meta keywords không được vượt quá 150 ký tự'),
     metaDesc: Yup.string()
       .required('Meta description là bắt buộc')
       .max(200, 'Meta description không được vượt quá 200 ký tự'),
     topicCategory: Yup.string().required('Danh mục bài thi là bắt buộc'),
+    exam: Yup.string().required('Danh mục bài thi là bắt buộc'),
     duration: Yup.number()
       .required('Thời gian làm bài là bắt buộc')
       .positive('Thời gian làm bài phải là số dương')
@@ -89,6 +121,7 @@ function AddExam() {
       .required('Hiển thị là bắt buộc')
       .oneOf([0, 1], 'Hiển thị phải là 0 hoặc 1'),
   })
+
   const fetchDataTopicCategory = async () => {
     try {
       const response = await axiosClient.get(`admin/news-category`)
@@ -96,7 +129,7 @@ function AddExam() {
         setDataExam(response.data.list)
       }
     } catch (error) {
-      console.error('Fetch data news is error', error)
+      console.error('Fetch data topic categories error', error)
     }
   }
 
@@ -126,6 +159,7 @@ function AddExam() {
       [qIndex]: prev[qIndex] === aIndex ? null : aIndex,
     }))
   }
+
   const closeMenu = () => {
     setMenuOpen({})
   }
@@ -166,7 +200,7 @@ function AddExam() {
     })
   }
 
-  // Xoá đáp án (nếu cần)
+  // Xoá đáp án
   const handleRemoveAnswer = (qIndex, aIndex) => {
     setQuestions((prev) => {
       const newQs = [...prev]
@@ -188,10 +222,9 @@ function AddExam() {
   const handleCheckCorrect = (qIndex, aIndex) => {
     setQuestions((prev) => {
       const newQs = [...prev]
-      newQs[qIndex].answers = newQs[qIndex].answers.map((ans, i) => ({
-        ...ans,
-        is_correct: i === aIndex, // Đánh dấu chỉ 1 câu đúng
-      }))
+      newQs[qIndex].answers = newQs[qIndex].answers.map((ans, i) =>
+        i === aIndex ? { ...ans, is_correct: !ans.is_correct } : ans,
+      )
       return newQs
     })
   }
@@ -282,6 +315,8 @@ function AddExam() {
     setFile(fileUrls)
   }
 
+  console.log('>>>>check questions', questions)
+
   return (
     <CContainer>
       <CRow className="mb-3">
@@ -290,7 +325,7 @@ function AddExam() {
         </CCol>
         <CCol md={6}>
           <div className="d-flex justify-content-end">
-            <Link to={'/exams/add'}>
+            <Link to={'/exams/examsList'}>
               <CButton color="primary" type="button" size="sm">
                 Danh sách
               </CButton>
@@ -306,7 +341,7 @@ function AddExam() {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ setValues }) => {
+            {({ setValues, values, setFieldValue }) => {
               return (
                 <Form>
                   <CRow>
@@ -381,6 +416,9 @@ function AddExam() {
                                   </div>
                                   <div className="answer__option-text">
                                     <CFormTextarea
+                                      style={{
+                                        fontSize: 14,
+                                      }}
                                       className="w-100"
                                       type="text"
                                       value={ans.option_text}
@@ -424,7 +462,9 @@ function AddExam() {
                                             closeMenu()
                                           }}
                                         >
-                                          ✅ Chọn đúng
+                                          {questions[qIndex].answers[aIndex].is_correct
+                                            ? '❌ Bỏ chọn'
+                                            : '✅ Chọn đúng'}
                                         </CButton>
                                       </div>
                                     )}
@@ -534,7 +574,7 @@ function AddExam() {
                     <CCol md={4}>
                       <CCol
                         md={12}
-                        className="border bg-white rounded p-2 overflow-scroll"
+                        className="border bg-white rounded p-2"
                         style={{ height: 'auto' }}
                       >
                         <label
@@ -572,6 +612,45 @@ function AddExam() {
                       </CCol>
                       <br />
 
+                      {values.topicCategory && (
+                        <CCol
+                          md={12}
+                          className="border bg-white rounded p-2"
+                          style={{ height: 'auto' }}
+                        >
+                          <label
+                            className="pb-2 mb-2 w-100"
+                            style={{
+                              fontWeight: 500,
+                              fontSize: 16,
+                              borderBottom: '1px solid #ddd',
+                            }}
+                            htmlFor="exam-select"
+                          >
+                            Bài thi
+                          </label>
+
+                          <Field
+                            className="component-size"
+                            name="exam"
+                            as={CFormSelect}
+                            id="exam-select"
+                            text="Lựa chọn bài thi."
+                          >
+                            <option value="">Chọn bài thi</option>
+                            {topicCategories
+                              .filter((topic) => topic.id == values.topicCategory)[0]
+                              .theories.map((exam) => (
+                                <option key={exam.id} value={exam.id}>
+                                  {exam.name}
+                                </option>
+                              ))}
+                          </Field>
+                          <ErrorMessage name="exam" component="div" className="text-danger" />
+                        </CCol>
+                      )}
+                      <br />
+
                       <CCol md={12}>
                         <label htmlFor="duration-input">Thời gian làm bài</label>
                         <Field
@@ -601,7 +680,7 @@ function AddExam() {
                           {Array.isArray(file) &&
                             file.length > 0 &&
                             file.map((item, index) => (
-                              <CImage className="border w-100" key={index} src={item} />
+                              <CImage className="border" width={200} key={index} src={item} />
                             ))}
                         </div>
                       </CCol>
