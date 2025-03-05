@@ -35,47 +35,28 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await axiosClient.post('/admin/login', {
+      const res = await axiosClient.post('/admin-login', {
         username,
         password,
       })
 
       const errorMessages = {
-        'The username field is required.': 'Tên đăng nhập không được để trống!',
-        'The password field is required.': 'Mật khẩu đăng nhập không được để trống!',
+        username: 'Tên đăng nhập không chính xác!',
+        pass: 'Mật khẩu đăng nhập không chính xác!',
       }
 
       if (res.data && res.data.status === true) {
         localStorage.setItem('quizToken', res.data.token)
-        localStorage.setItem('username', res.data.display_name)
+        localStorage.setItem('username', res.data.username)
         navigate('/')
-      } else if (res.data && res.data.status === false && res.data.message) {
-        toast.error(errorMessages[res.data.message] || 'Đã xảy ra lỗi. Vui lòng thử lại!')
+      } else if (res.data && res.data.status === false && res.data.mess) {
+        toast.error(errorMessages[res.data.mess] || 'Đã xảy ra lỗi. Vui lòng thử lại!')
       } else {
         toast.error('Phản hồi từ máy chủ không hợp lệ. Vui lòng thử lại!')
       }
     } catch (error) {
       console.error('Post login data is error', error)
-      handleLoginError(error)
     }
-  }
-
-  const handleLoginError = (error) => {
-    if (error.response) {
-      const { status, data } = error.response
-      if (status === 404) {
-        toast.error('Tài khoản không tồn tại! Vui lòng kiểm tra lại!')
-      } else if (status === 401) {
-        toast.error('Mật khẩu không đúng! Vui lòng nhập lại!')
-      } else {
-        toast.error('Đã xảy ra lỗi. Vui lòng kiểm tra lại thông tin!')
-      }
-    } else if (error.request) {
-      toast.error('Không thể kết nối đến máy chủ. Vui lòng thử lại sau!')
-    } else {
-      toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
-    }
-    console.error('Post login data is error', error)
   }
 
   return (

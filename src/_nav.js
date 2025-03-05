@@ -57,7 +57,7 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'Quản lý danh mục thi',
+        name: 'Quản lý danh mục bài học',
         to: '/lessons/category',
       },
 

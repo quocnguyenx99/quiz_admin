@@ -14,7 +14,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { axiosClient, imageBaseUrl } from '../../axiosConfig'
 
 import { toast } from 'react-toastify'
@@ -23,6 +23,7 @@ import { CKEditor } from 'ckeditor4-react'
 import './style/addExam.scss'
 import CIcon from '@coreui/icons-react'
 import { cilLibraryAdd } from '@coreui/icons'
+import { duration } from 'moment'
 
 const topicCategories = [
   {
@@ -66,13 +67,11 @@ const topicCategories = [
 function EditExam() {
   const [dataExam, setDataExam] = useState([])
 
-  const [questions, setQuestions] = useState([
-    {
-      question_text: '',
-      explanation: '',
-      answers: [{ option_letter: 'A', option_text: '', is_correct: false }],
-    },
-  ])
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const id = searchParams.get('id')
+
+  const [questions, setQuestions] = useState([])
 
   const [menuOpen, setMenuOpen] = useState({})
   const menuRef = useRef(null)
@@ -83,11 +82,9 @@ function EditExam() {
   const initialValues = {
     title: '',
     friendlyUrl: '',
-    pageTitle: '',
-    metaKeyword: '',
-    metaDesc: '',
     topicCategory: '',
     duration: '',
+    pointAward: '',
     visible: 0,
   }
 
@@ -101,20 +98,16 @@ function EditExam() {
         /^[a-z0-9-]+$/,
         'Chuỗi đường dẫn chỉ bao gồm chữ cái thường, số và dấu gạch ngang (-)',
       ),
-    pageTitle: Yup.string()
-      .required('Tiêu đề trang là bắt buộc')
-      .max(60, 'Tiêu đề trang không được vượt quá 100 ký tự'),
-    metaKeyword: Yup.string()
-      .required('Meta keywords là bắt buộc')
-      .max(150, 'Meta keywords không được vượt quá 150 ký tự'),
-    metaDesc: Yup.string()
-      .required('Meta description là bắt buộc')
-      .max(200, 'Meta description không được vượt quá 200 ký tự'),
-    topicCategory: Yup.string().required('Danh mục bài thi là bắt buộc'),
     duration: Yup.number()
       .required('Thời gian làm bài là bắt buộc')
       .positive('Thời gian làm bài phải là số dương')
       .integer('Thời gian làm bài phải là số nguyên'),
+
+    pointAward: Yup.number()
+      .required('Thời gian làm bài là bắt buộc')
+      .positive('Thời gian làm bài phải là số dương')
+      .integer('Thời gian làm bài phải là số nguyên'),
+
     visible: Yup.number()
       .required('Hiển thị là bắt buộc')
       .oneOf([0, 1], 'Hiển thị phải là 0 hoặc 1'),
@@ -133,6 +126,44 @@ function EditExam() {
   useEffect(() => {
     fetchDataTopicCategory()
   }, [])
+
+  const transformData = (data) => {
+    console.log('>>>>check data', data)
+
+    return data.map((q) => ({
+      question_text: q.description,
+      explanation: '',
+      answers: q.answer.map((ans) => ({
+        option_letter: ans.letter,
+        option_text: ans.description,
+        is_correct: ans.correct_answer === 1,
+      })),
+    }))
+  }
+
+  const fetchDataById = async (setValues) => {
+    try {
+      const response = await axiosClient.get(`admin/quiz/${id}/edit`)
+
+      if (response.data && response.data.status === true) {
+        const data = response.data.data
+        const questions = response.data.data.question
+
+        setValues({
+          title: data?.name,
+          friendlyUrl: data?.friendly_url,
+          duration: data?.time,
+          pointAward: data?.pointAward,
+          visible: data?.display,
+        })
+        setQuestions(transformData(questions))
+      } else {
+        console.error('No data found for the given ID.')
+      }
+    } catch (error) {
+      console.error('Fetch data id news is error', error.message)
+    }
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -226,8 +257,7 @@ function EditExam() {
   }
 
   const handleSubmit = async (values) => {
-    console.log('>>>>check values: ', values)
-
+    let hasError = false
     questions.forEach((q, qIndex) => {
       if (q.question_text.trim() === '') {
         toast.error(`Câu hỏi số ${qIndex + 1} không được để trống`)
@@ -255,22 +285,16 @@ function EditExam() {
 
     try {
       setIsLoading(true)
-      const response = await axiosClient.put('admin/exam', {
+      const response = await axiosClient.put(`admin/quiz/${id}`, {
         title: values.title,
-        friendly_url: values.friendlyUrl,
-        friendly_title: values.pageTitle,
-        metakey: values.metaKeyword,
-        metadesc: values.metaDesc,
-        questionArr: selectedCateCheckbox,
+        friendlyUrl: values.friendlyUrl,
+        questions: questions,
         duration: values.duration,
-        picture: selectedFile,
-        display: values.visible,
+        pointAward: values.pointAward,
+        visible: values.visible,
       })
       if (response.data.status === true) {
         toast.success('Bài thi đã được cập nhật!')
-      }
-      if (response.data.status === false && response.data.mess == 'no permission') {
-        toast.warn('Bạn không có quyền thực hiện tác vụ này!')
       }
     } catch (error) {
       console.error('Put data exam is error', error)
@@ -311,6 +335,8 @@ function EditExam() {
     setFile(fileUrls)
   }
 
+  console.log('>>>>check questions', questions)
+
   return (
     <CContainer>
       <CRow className="mb-3">
@@ -336,6 +362,9 @@ function EditExam() {
             onSubmit={handleSubmit}
           >
             {({ setValues, values, setFieldValue }) => {
+              useEffect(() => {
+                fetchDataById(setValues)
+              }, [setValues, id])
               return (
                 <Form>
                   <CRow>
@@ -356,6 +385,26 @@ function EditExam() {
                       </CCol>
                       <br />
 
+                      <div className="bg-white p-3 border rounded">
+                        <h6>Search Engine Optimization</h6>
+                        <CCol md={12}>
+                          <label htmlFor="url-input">Chuỗi đường dẫn</label>
+                          <Field
+                            name="friendlyUrl"
+                            type="text"
+                            as={CFormInput}
+                            id="url-input"
+                            text="Chuỗi dẫn tĩnh là phiên bản của tên hợp chuẩn với Đường dẫn (URL). Chuỗi này bao gồm chữ cái thường, số và dấu gạch ngang (-). VD: vi-tinh-nguyen-kim-to-chuc-su-kien-tri-an-dip-20-nam-thanh-lap"
+                          />
+                          <ErrorMessage
+                            name="friendlyUrl"
+                            component="div"
+                            className="text-danger"
+                          />
+                        </CCol>
+                      </div>
+                      <br />
+
                       <CCol md={12}>
                         <div className="border p-2 rounded bg-white">
                           {questions.map((q, qIndex) => (
@@ -366,7 +415,7 @@ function EditExam() {
                                   height: 70,
                                   versionCheck: false,
                                 }}
-                                data={q.question_text}
+                                initData={q.question_text}
                                 onChange={(event) => {
                                   const data = event.editor.getData()
                                   handleQuestionTextChange(qIndex, data)
@@ -503,67 +552,8 @@ function EditExam() {
                         </CButton>
                       </CCol>
                       <br />
-
-                      <div className="bg-white p-3 border rounded">
-                        <h6>Search Engine Optimization</h6>
-                        <CCol md={12}>
-                          <label htmlFor="url-input">Chuỗi đường dẫn</label>
-                          <Field
-                            name="friendlyUrl"
-                            type="text"
-                            as={CFormInput}
-                            id="url-input"
-                            text="Chuỗi dẫn tĩnh là phiên bản của tên hợp chuẩn với Đường dẫn (URL). Chuỗi này bao gồm chữ cái thường, số và dấu gạch ngang (-). VD: vi-tinh-nguyen-kim-to-chuc-su-kien-tri-an-dip-20-nam-thanh-lap"
-                          />
-                          <ErrorMessage
-                            name="friendlyUrl"
-                            component="div"
-                            className="text-danger"
-                          />
-                        </CCol>
-                        <br />
-                        <CCol md={12}>
-                          <label htmlFor="pageTitle-input">Tiêu đề trang</label>
-                          <Field
-                            name="pageTitle"
-                            type="text"
-                            as={CFormInput}
-                            id="pageTitle-input"
-                            text="Độ dài của tiêu đề trang tối đa 60 ký tự."
-                          />
-                          <ErrorMessage name="pageTitle" component="div" className="text-danger" />
-                        </CCol>
-                        <br />
-                        <CCol md={12}>
-                          <label htmlFor="metaKeyword-input">Meta keywords</label>
-                          <Field
-                            name="metaKeyword"
-                            type="text"
-                            as={CFormTextarea}
-                            id="metaKeyword-input"
-                            text="Độ dài của meta keywords chuẩn là từ 100 đến 150 ký tự, trong đó có ít nhất 4 dấu phẩy (,)."
-                          />
-                          <ErrorMessage
-                            name="metaKeyword"
-                            component="div"
-                            className="text-danger"
-                          />
-                        </CCol>
-                        <br />
-                        <CCol md={12}>
-                          <label htmlFor="metaDesc-input">Meta description</label>
-                          <Field
-                            name="metaDesc"
-                            type="text"
-                            as={CFormTextarea}
-                            id="metaDesc-input"
-                            text="Thẻ meta description chỉ nên dài khoảng 140 kí tự để có thể hiển thị hết được trên Google. Tối đa 200 ký tự."
-                          />
-                          <ErrorMessage name="metaDesc" component="div" className="text-danger" />
-                        </CCol>
-                        <br />
-                      </div>
                     </CCol>
+                    <br />
 
                     <CCol md={4}>
                       <CCol
@@ -659,24 +649,15 @@ function EditExam() {
                       <br />
 
                       <CCol md={12}>
-                        <CFormInput
-                          name="avatar"
-                          type="file"
-                          id="formFile"
-                          label="Ảnh đại diện"
-                          // size="sm"
-                          onChange={(e) => onFileChange(e)}
+                        <label htmlFor="pointAward-input">Điểm thưởng</label>
+                        <Field
+                          name="pointAward"
+                          type="number"
+                          as={CFormInput}
+                          id="pointAward-input"
+                          text="Điểm thưởng nên được đặt chẵn."
                         />
-                        <br />
-                        <ErrorMessage name="avatar" component="div" className="text-danger" />
-
-                        <div>
-                          {Array.isArray(file) &&
-                            file.length > 0 &&
-                            file.map((item, index) => (
-                              <CImage className="border" width={200} key={index} src={item} />
-                            ))}
-                        </div>
+                        <ErrorMessage name="pointAward" component="div" className="text-danger" />
                       </CCol>
                       <br />
 
@@ -687,8 +668,8 @@ function EditExam() {
                           as={CFormSelect}
                           id="visible-select"
                           options={[
-                            { label: 'Không', value: '0' },
-                            { label: 'Có', value: '1' },
+                            { label: 'Không', value: 0 },
+                            { label: 'Có', value: 1 },
                           ]}
                         />
                         <ErrorMessage name="visible" component="div" className="text-danger" />

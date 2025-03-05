@@ -20,6 +20,10 @@ const ExamsList = React.lazy(() => import('./views/exam/ExamsList'))
 const AddExam = React.lazy(() => import('./views/exam/AddExam'))
 const EditExam = React.lazy(() => import('./views/exam/EditExam'))
 
+// TAB BÀI HỌC
+const LessonCategories = React.lazy(() => import('./views/lesson/category/LessonCategories'))
+const AddLesson = React.lazy(() => import('./views/lesson/list/AddLesson'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
 
@@ -33,9 +37,13 @@ const routes = [
   { path: '/admin/adminList', name: 'AdminList', element: AdminList },
   { path: '/admin/log', name: 'AdminLog', element: AdminLog },
 
-  { path: '/exams/examsList', name: 'AddExam', element: ExamsList, exact: true },
+  { path: '/exams/examsList', name: 'ExamsList', element: ExamsList, exact: true },
   { path: '/exams/add', name: 'AddExam', element: AddExam, exact: true },
-  { path: '/exams/edit', name: 'AddExam', element: EditExam, exact: true },
+  { path: '/exams/edit', name: 'EditExam', element: EditExam, exact: true },
+
+  { path: '/lessons/category', name: 'LessonCategories', element: LessonCategories, exact: true },
+
+  { path: '/lessons/add', name: 'AddLesson', element: AddLesson, exact: true },
 ]
 
 export default routes

@@ -83,12 +83,13 @@ function AddExam() {
   const initialValues = {
     title: '',
     friendlyUrl: '',
-    pageTitle: '',
-    metaKeyword: '',
-    metaDesc: '',
+    // pageTitle: '',
+    // metaKeyword: '',
+    // metaDesc: '',
     topicCategory: '',
     exam: '',
     duration: '',
+    pointAward: '',
     visible: 0,
   }
 
@@ -102,21 +103,27 @@ function AddExam() {
         /^[a-z0-9-]+$/,
         'Chuỗi đường dẫn chỉ bao gồm chữ cái thường, số và dấu gạch ngang (-)',
       ),
-    pageTitle: Yup.string()
-      .required('Tiêu đề trang là bắt buộc')
-      .max(60, 'Tiêu đề trang không được vượt quá 100 ký tự'),
-    metaKeyword: Yup.string()
-      .required('Meta keywords là bắt buộc')
-      .max(150, 'Meta keywords không được vượt quá 150 ký tự'),
-    metaDesc: Yup.string()
-      .required('Meta description là bắt buộc')
-      .max(200, 'Meta description không được vượt quá 200 ký tự'),
-    topicCategory: Yup.string().required('Danh mục bài thi là bắt buộc'),
-    exam: Yup.string().required('Danh mục bài thi là bắt buộc'),
+    // pageTitle: Yup.string()
+    //   .required('Tiêu đề trang là bắt buộc')
+    //   .max(60, 'Tiêu đề trang không được vượt quá 100 ký tự'),
+    // metaKeyword: Yup.string()
+    //   .required('Meta keywords là bắt buộc')
+    //   .max(150, 'Meta keywords không được vượt quá 150 ký tự'),
+    // metaDesc: Yup.string()
+    //   .required('Meta description là bắt buộc')
+    //   .max(200, 'Meta description không được vượt quá 200 ký tự'),
+    // topicCategory: Yup.string().required('Danh mục bài thi là bắt buộc'),
+    // exam: Yup.string().required('Danh mục bài thi là bắt buộc'),
     duration: Yup.number()
       .required('Thời gian làm bài là bắt buộc')
       .positive('Thời gian làm bài phải là số dương')
       .integer('Thời gian làm bài phải là số nguyên'),
+
+    pointAward: Yup.number()
+      .required('Thời gian làm bài là bắt buộc')
+      .positive('Thời gian làm bài phải là số dương')
+      .integer('Thời gian làm bài phải là số nguyên'),
+
     visible: Yup.number()
       .required('Hiển thị là bắt buộc')
       .oneOf([0, 1], 'Hiển thị phải là 0 hoặc 1'),
@@ -230,8 +237,7 @@ function AddExam() {
   }
 
   const handleSubmit = async (values) => {
-    console.log('>>>>check values: ', values)
-
+    let hasError = false
     questions.forEach((q, qIndex) => {
       if (q.question_text.trim() === '') {
         toast.error(`Câu hỏi số ${qIndex + 1} không được để trống`)
@@ -259,22 +265,17 @@ function AddExam() {
 
     try {
       setIsLoading(true)
-      const response = await axiosClient.post('admin/exam', {
+      const response = await axiosClient.post('/admin/quiz', {
         title: values.title,
-        friendly_url: values.friendlyUrl,
-        friendly_title: values.pageTitle,
-        metakey: values.metaKeyword,
-        metadesc: values.metaDesc,
-        questionArr: selectedCateCheckbox,
+        friendlyUrl: values.friendlyUrl,
+        questions: questions,
         duration: values.duration,
+        pointAward: values.pointAward,
         picture: selectedFile,
-        display: values.visible,
+        visible: values.visible,
       })
       if (response.data.status === true) {
         toast.success('Bài thi đã được thêm mới!')
-      }
-      if (response.data.status === false && response.data.mess == 'no permission') {
-        toast.warn('Bạn không có quyền thực hiện tác vụ này!')
       }
     } catch (error) {
       console.error('Post data exam is error', error)
@@ -315,8 +316,6 @@ function AddExam() {
     setFile(fileUrls)
   }
 
-  console.log('>>>>check questions', questions)
-
   return (
     <CContainer>
       <CRow className="mb-3">
@@ -355,11 +354,33 @@ function AddExam() {
                               type="text"
                               id="title-input"
                               text="Tên riêng sẽ hiển thị lên trang web của bạn."
+                              size="lg"
                             />
                           )}
                         </Field>
                         <ErrorMessage name="title" component="div" className="text-danger" />
                       </CCol>
+                      <br />
+
+                      <div className="bg-white p-3 border rounded">
+                        <h6>Search Engine Optimization</h6>
+                        <CCol md={12}>
+                          <label htmlFor="url-input">Chuỗi đường dẫn</label>
+                          <Field
+                            name="friendlyUrl"
+                            type="text"
+                            as={CFormInput}
+                            id="url-input"
+                            text="Chuỗi dẫn tĩnh là phiên bản của tên hợp chuẩn với Đường dẫn (URL). Chuỗi này bao gồm chữ cái thường, số và dấu gạch ngang (-). VD: vi-tinh-nguyen-kim-to-chuc-su-kien-tri-an-dip-20-nam-thanh-lap"
+                          />
+                          <ErrorMessage
+                            name="friendlyUrl"
+                            component="div"
+                            className="text-danger"
+                          />
+                        </CCol>
+                        <br />
+                      </div>
                       <br />
 
                       <CCol md={12}>
@@ -509,66 +530,6 @@ function AddExam() {
                         </CButton>
                       </CCol>
                       <br />
-
-                      <div className="bg-white p-3 border rounded">
-                        <h6>Search Engine Optimization</h6>
-                        <CCol md={12}>
-                          <label htmlFor="url-input">Chuỗi đường dẫn</label>
-                          <Field
-                            name="friendlyUrl"
-                            type="text"
-                            as={CFormInput}
-                            id="url-input"
-                            text="Chuỗi dẫn tĩnh là phiên bản của tên hợp chuẩn với Đường dẫn (URL). Chuỗi này bao gồm chữ cái thường, số và dấu gạch ngang (-). VD: vi-tinh-nguyen-kim-to-chuc-su-kien-tri-an-dip-20-nam-thanh-lap"
-                          />
-                          <ErrorMessage
-                            name="friendlyUrl"
-                            component="div"
-                            className="text-danger"
-                          />
-                        </CCol>
-                        <br />
-                        <CCol md={12}>
-                          <label htmlFor="pageTitle-input">Tiêu đề trang</label>
-                          <Field
-                            name="pageTitle"
-                            type="text"
-                            as={CFormInput}
-                            id="pageTitle-input"
-                            text="Độ dài của tiêu đề trang tối đa 60 ký tự."
-                          />
-                          <ErrorMessage name="pageTitle" component="div" className="text-danger" />
-                        </CCol>
-                        <br />
-                        <CCol md={12}>
-                          <label htmlFor="metaKeyword-input">Meta keywords</label>
-                          <Field
-                            name="metaKeyword"
-                            type="text"
-                            as={CFormTextarea}
-                            id="metaKeyword-input"
-                            text="Độ dài của meta keywords chuẩn là từ 100 đến 150 ký tự, trong đó có ít nhất 4 dấu phẩy (,)."
-                          />
-                          <ErrorMessage
-                            name="metaKeyword"
-                            component="div"
-                            className="text-danger"
-                          />
-                        </CCol>
-                        <br />
-                        <CCol md={12}>
-                          <label htmlFor="metaDesc-input">Meta description</label>
-                          <Field
-                            name="metaDesc"
-                            type="text"
-                            as={CFormTextarea}
-                            id="metaDesc-input"
-                            text="Thẻ meta description chỉ nên dài khoảng 140 kí tự để có thể hiển thị hết được trên Google. Tối đa 200 ký tự."
-                          />
-                          <ErrorMessage name="metaDesc" component="div" className="text-danger" />
-                        </CCol>
-                        <br />
-                      </div>
                     </CCol>
 
                     <CCol md={4}>
@@ -665,6 +626,19 @@ function AddExam() {
                       <br />
 
                       <CCol md={12}>
+                        <label htmlFor="pointAward-input">Điểm thưởng</label>
+                        <Field
+                          name="pointAward"
+                          type="number"
+                          as={CFormInput}
+                          id="pointAward-input"
+                          text="Điểm thưởng nên được đặt chẵn."
+                        />
+                        <ErrorMessage name="pointAward" component="div" className="text-danger" />
+                      </CCol>
+                      <br />
+
+                      {/* <CCol md={12}>
                         <CFormInput
                           name="avatar"
                           type="file"
@@ -684,7 +658,7 @@ function AddExam() {
                             ))}
                         </div>
                       </CCol>
-                      <br />
+                      <br /> */}
 
                       <CCol md={12}>
                         <label htmlFor="visible-select">Hiển thị</label>
@@ -693,8 +667,8 @@ function AddExam() {
                           as={CFormSelect}
                           id="visible-select"
                           options={[
-                            { label: 'Không', value: '0' },
-                            { label: 'Có', value: '1' },
+                            { label: 'Không', value: 0 },
+                            { label: 'Có', value: 1 },
                           ]}
                         />
                         <ErrorMessage name="visible" component="div" className="text-danger" />

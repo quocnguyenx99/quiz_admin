@@ -25,35 +25,7 @@ import { axiosClient, imageBaseUrl } from '../../axiosConfig'
 import CIcon from '@coreui/icons-react'
 import { cilColorBorder, cilTrash } from '@coreui/icons'
 import DeletedModal from '../../components/deletedModal/DeletedModal'
-
-const dataSample = [
-  {
-    id: 1,
-    title: 'Học lập trình Python',
-    category: {
-      id: 1,
-      name: 'Lập trình',
-      theory: {
-        lesson_name: 'Bài học 1: Giới thiệu về Python',
-      },
-    },
-    time: 20,
-    updateTime: '2025-03-04T09:00:00',
-  },
-  {
-    id: 2,
-    title: 'Học lập trình JavaScript',
-    category: {
-      id: 2,
-      name: 'Lập trình',
-      theory: {
-        lesson_name: 'Bài học 1: Giới thiệu về JavaScript',
-      },
-    },
-    time: 25,
-    updateTime: '2025-03-04T10:30:00',
-  },
-]
+import useDebounce from '../../helper/debounce'
 
 const topicCategoriesData = [
   {
@@ -99,7 +71,7 @@ function ExamsList() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const [dataExamsList, setDataExamsList] = useState(dataSample)
+  const [dataExamsList, setDataExamsList] = useState([])
   const [topicCategories, setTopicCategories] = useState(topicCategoriesData)
   const [selectedTopicCategory, setSelectedTopicCategory] = useState([])
 
@@ -122,6 +94,7 @@ function ExamsList() {
 
   // search input
   const [dataSearch, setDataSearch] = useState('')
+  const debouncedSearchTerm = useDebounce(dataSearch, 1000)
 
   // sort filter table
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
@@ -171,10 +144,10 @@ function ExamsList() {
     try {
       setIsLoading(true)
       const response = await axiosClient.get(
-        `admin/product?page=${pageNumber}&data=${dataSearch}&categroy=${selectedTopicCategory}`,
+        `/admin/quiz?page=${pageNumber}&data=${dataSearch}&categroy=${selectedTopicCategory}`,
       )
       if (response.data.status === true) {
-        setDataExamsList(response.data.product)
+        setDataExamsList(response.data.data)
       }
     } catch (error) {
       console.error('Fetch data exams list is error', error.message)
@@ -185,7 +158,7 @@ function ExamsList() {
 
   useEffect(() => {
     fetchDataExamsList()
-  }, [pageNumber, dataSearch, selectedTopicCategory])
+  }, [pageNumber, debouncedSearchTerm, selectedTopicCategory])
 
   // handle toggle filter table
   const handleToggleCollapse = () => {
@@ -193,7 +166,7 @@ function ExamsList() {
   }
 
   const handleSearch = (keyword) => {
-    fetchProductData(keyword)
+    fetchDataExamsList(keyword)
   }
 
   const handleEditClick = (id) => {
@@ -275,7 +248,7 @@ function ExamsList() {
               <tbody>
                 <tr>
                   <td>Tổng cộng</td>
-                  <td className="total-count">{100}</td>
+                  <td className="total-count">{dataExamsList?.total}</td>
                 </tr>
                 <tr>
                   <td>Lọc</td>
@@ -384,10 +357,35 @@ function ExamsList() {
                   </CTableHeaderCell>
                   <CTableHeaderCell
                     scope="col"
+                    onClick={() => handleSort('category.name')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Bài thi{' '}
+                    {sortConfig.key === 'category.name'
+                      ? sortConfig.direction === 'asc'
+                        ? '🔼'
+                        : '🔽'
+                      : ''}
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    scope="col"
                     onClick={() => handleSort('time')}
                     style={{ cursor: 'pointer' }}
                   >
                     Thời gian{' '}
+                    {sortConfig.key === 'time'
+                      ? sortConfig.direction === 'asc'
+                        ? '🔼'
+                        : '🔽'
+                      : ''}
+                  </CTableHeaderCell>
+
+                  <CTableHeaderCell
+                    scope="col"
+                    onClick={() => handleSort('time')}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Điểm thưởng{' '}
                     {sortConfig.key === 'time'
                       ? sortConfig.direction === 'asc'
                         ? '🔼'
@@ -410,9 +408,9 @@ function ExamsList() {
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {dataExamsList &&
-                  dataExamsList.length > 0 &&
-                  dataExamsList.map((item) => (
+                {dataExamsList?.data &&
+                  dataExamsList?.data.length > 0 &&
+                  dataExamsList?.data?.map((item) => (
                     <CTableRow key={item.id}>
                       <CTableHeaderCell scope="row">
                         <CFormCheck
@@ -436,13 +434,14 @@ function ExamsList() {
                         />
                       </CTableHeaderCell>
                       <CTableDataCell>
-                        <Link to={`/exams/edit?id=${item?.id}`}>{item.title}</Link>
+                        <Link to={`/exams/edit?id=${item?.id}`}>{item.name}</Link>
                       </CTableDataCell>
                       <CTableDataCell>{item?.category?.name}</CTableDataCell>
                       <CTableDataCell>{item?.category?.theory?.lesson_name}</CTableDataCell>
                       <CTableDataCell>{item?.time}</CTableDataCell>
+                      <CTableDataCell>{item?.pointAward}</CTableDataCell>
                       <CTableDataCell>
-                        {moment(item?.updateTime).format('DD-MM-YYYY, hh:mm:ss A')}
+                        {moment(item?.updated_at).format('DD-MM-YYYY, hh:mm:ss A')}
                       </CTableDataCell>
 
                       <CTableDataCell>
@@ -477,7 +476,7 @@ function ExamsList() {
       <CRow className="mt-3">
         <div className="d-flex justify-content-end">
           <ReactPaginate
-            pageCount={Math.ceil(100 / 10)}
+            pageCount={Math.ceil(dataExamsList.total / dataExamsList.per_page)}
             pageRangeDisplayed={3}
             marginPagesDisplayed={1}
             pageClassName="page-item"

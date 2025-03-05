@@ -10,21 +10,21 @@ import { axiosClient } from '../axiosConfig'
 
 export const AppSidebarNav = ({ items }) => {
   const [dataNotSeen, setDataNotSeen] = useState({})
-  useEffect(() => {
-    const fetchNotSeenData = async () => {
-      try {
-        const response = await axiosClient.get('/admin/no-approved-statistics')
+  // useEffect(() => {
+  //   const fetchNotSeenData = async () => {
+  //     try {
+  //       const response = await axiosClient.get('/admin/no-approved-statistics')
 
-        if (response.data.status === true) {
-          setDataNotSeen(response.data)
-        }
-      } catch (error) {
-        console.error('Fetch data not seen is error', error)
-      }
-    }
+  //       if (response.data.status === true) {
+  //         setDataNotSeen(response.data)
+  //       }
+  //     } catch (error) {
+  //       console.error('Fetch data not seen is error', error)
+  //     }
+  //   }
 
-    fetchNotSeenData()
-  }, [])
+  //   fetchNotSeenData()
+  // }, [])
 
   const navLink = (name, icon, badge, indent = false) => {
     return (
