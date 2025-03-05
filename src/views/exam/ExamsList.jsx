@@ -13,11 +13,11 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import ReactPaginate from 'react-paginate'
-import moment, { duration } from 'moment'
+import moment from 'moment'
 import { toast } from 'react-toastify'
 
 import Loading from '../../components/loading/Loading'
@@ -177,32 +177,32 @@ function ExamsList() {
   const handleDelete = async () => {
     setVisible(true)
     try {
-      const response = await axiosClient.delete(`/admin/information/${deletedId}`)
+      const response = await axiosClient.delete(`/admin/quiz/${deletedId}`)
       if (response.data.status === true) {
         setVisible(false)
         fetchDataExamsList()
       }
     } catch (error) {
-      console.error('Delete admin id is error', error)
+      console.error('Delete exam id error', error)
       toast.error('Đã xảy ra lỗi khi xóa. Vui lòng thử lại!')
     }
   }
 
   const handleDeleteAll = async () => {
-    try {
-      const response = await axiosClient.post(`admin/delete-all-hot `, {
-        data: selectedUnDealCheckbox,
-      })
-
-      if (response.data.status === true) {
-        toast.success('Xóa các mục đã chọn thành công!')
-        fetchDataExamsList()
-        setSelectedUnDealCheckbox([])
-      }
-    } catch (error) {
-      console.error('Post set delete all is error', error)
-      toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
-    }
+    alert('Đang phát triển ...')
+    // try {
+    //   const response = await axiosClient.post(`admin/delete-all-hot `, {
+    //     data: selectedUnDealCheckbox,
+    //   })
+    //   if (response.data.status === true) {
+    //     toast.success('Xóa các mục đã chọn thành công!')
+    //     fetchDataExamsList()
+    //     setSelectedUnDealCheckbox([])
+    //   }
+    // } catch (error) {
+    //   console.error('Post set delete all is error', error)
+    //   toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
+    // }
   }
 
   return (

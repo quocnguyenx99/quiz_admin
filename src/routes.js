@@ -23,6 +23,8 @@ const EditExam = React.lazy(() => import('./views/exam/EditExam'))
 // TAB BÀI HỌC
 const LessonCategories = React.lazy(() => import('./views/lesson/category/LessonCategories'))
 const AddLesson = React.lazy(() => import('./views/lesson/list/AddLesson'))
+const EditLesson = React.lazy(() => import('./views/lesson/list/EditLesson'))
+const LessonsList = React.lazy(() => import('./views/lesson/list/LessonsList'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -44,6 +46,8 @@ const routes = [
   { path: '/lessons/category', name: 'LessonCategories', element: LessonCategories, exact: true },
 
   { path: '/lessons/add', name: 'AddLesson', element: AddLesson, exact: true },
+  { path: '/lessons/edit', name: 'EditLesson', element: EditLesson, exact: true },
+  { path: '/lessons/lessonsList', name: 'LessonsList', element: LessonsList, exact: true },
 ]
 
 export default routes

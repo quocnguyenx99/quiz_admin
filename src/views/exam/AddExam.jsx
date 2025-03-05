@@ -547,7 +547,7 @@ function AddExam() {
                           }}
                           htmlFor="visible-input"
                         >
-                          Danh mục bài thi
+                          Danh mục bài học
                         </label>
 
                         <Field
@@ -588,7 +588,7 @@ function AddExam() {
                             }}
                             htmlFor="exam-select"
                           >
-                            Bài thi
+                            Bài học
                           </label>
 
                           <Field

@@ -55,7 +55,7 @@ const AppHeader = () => {
         <CHeaderNav className="d-none d-md-flex">
           <CNavItem>
             <CNavLink to="/dashboard" as={NavLink} style={{ fontWeight: 500, fontSize: 18 }}>
-              Bài thi trắc nghiệm
+              Home
             </CNavLink>
           </CNavItem>
         </CHeaderNav>

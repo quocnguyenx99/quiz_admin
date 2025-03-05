@@ -27,20 +27,20 @@ const AppHeaderDropdown = () => {
     navigate('/login')
   }
 
-  const fetchAdminInfo = async () => {
-    try {
-      const response = await axiosClient.get('/admin/information')
-      if (response.data.status === true) {
-        setAvatar(response.data.admin_detail.avatar)
-      }
-    } catch (error) {
-      console.error('Fetch data admin info error', error)
-    }
-  }
+  // const fetchAdminInfo = async () => {
+  //   try {
+  //     const response = await axiosClient.get('/admin/information')
+  //     if (response.data.status === true) {
+  //       setAvatar(response.data.admin_detail.avatar)
+  //     }
+  //   } catch (error) {
+  //     console.error('Fetch data admin info error', error)
+  //   }
+  // }
 
-  useEffect(() => {
-    fetchAdminInfo()
-  }, [])
+  // useEffect(() => {
+  //   fetchAdminInfo()
+  // }, [])
 
   return (
     <CDropdown variant="nav-item">
