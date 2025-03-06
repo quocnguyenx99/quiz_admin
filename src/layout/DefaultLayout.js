@@ -15,7 +15,7 @@ const DefaultLayout = () => {
       <ScrollUpButton />
       <ToastContainer
         position="top-center"
-        autoClose={false}
+        autoClose={5000}
         hideProgressBar={true}
         newestOnTop={false}
         closeOnClick
@@ -23,7 +23,7 @@ const DefaultLayout = () => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
+        theme="colored"
         transition={Slide}
       />
       <AppSidebar />

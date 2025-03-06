@@ -71,7 +71,8 @@ function LessonList() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [dataLessonList, setDataLessonList] = useState([])
-  const [topicCategories, setTopicCategories] = useState(topicCategoriesData)
+  const [lessonPagination, setLessonPagination] = useState({})
+  const [topicCategories, setTopicCategories] = useState([])
   const [selectedTopicCategory, setSelectedTopicCategory] = useState([])
 
   const initialPage = Number(searchParams.get('page')) || 1
@@ -126,9 +127,9 @@ function LessonList() {
 
   const fetchDataTopicCategories = async () => {
     try {
-      const response = await axiosClient.get(`admin/exam-category`)
+      const response = await axiosClient.get(`/theory-category`)
       if (response.data.status === true) {
-        setTopicCategories(response.data.data)
+        setTopicCategories(response.data.list)
       }
     } catch (error) {
       console.error('Fetch data topic categories error', error)
@@ -143,10 +144,11 @@ function LessonList() {
     try {
       setIsLoading(true)
       const response = await axiosClient.get(
-        `/admin/quiz?page=${pageNumber}&data=${dataSearch}&categroy=${selectedTopicCategory}`,
+        `/theory?page=${pageNumber}&data=${dataSearch}&cat_id=${selectedTopicCategory}`,
       )
       if (response.data.status === true) {
-        setDataLessonList(response.data.data)
+        setDataLessonList(response.data.list)
+        setLessonPagination(response.data.pagination)
       }
     } catch (error) {
       console.error('Fetch data lesson list error', error.message)
@@ -210,10 +212,10 @@ function LessonList() {
 
       <CRow className="my-3">
         <CCol>
-          <h2>DANH SÁCH BÀI HỌC</h2>
+          <h3>DANH SÁCH BÀI HỌC</h3>
         </CCol>
         <CCol md={{ span: 4, offset: 4 }}>
-          <div className="d-flex justify-content-end gap-3">
+          <div className="d-flex justify-content-end gap-2">
             <Link to={`/lessons/add`}>
               <CButton color="primary" type="submit" size="sm">
                 Thêm mới
@@ -247,7 +249,7 @@ function LessonList() {
               <tbody>
                 <tr>
                   <td>Tổng cộng</td>
-                  <td className="total-count">{dataLessonList?.total}</td>
+                  <td className="total-count">{lessonPagination?.total}</td>
                 </tr>
                 <tr>
                   <td>Lọc</td>
@@ -268,8 +270,8 @@ function LessonList() {
                           { label: 'Tất cả', value: '' },
                           ...(topicCategories && topicCategories.length > 0
                             ? topicCategories.map((topic) => ({
-                                label: topic.name,
-                                value: topic.id,
+                                label: topic.title,
+                                value: topic.cat_id,
                               }))
                             : []),
                         ]}
@@ -368,7 +370,7 @@ function LessonList() {
                     onClick={() => handleSort('updateTime')}
                     style={{ cursor: 'pointer' }}
                   >
-                    Update Time{' '}
+                    Create Time{' '}
                     {sortConfig.key === 'updateTime'
                       ? sortConfig.direction === 'asc'
                         ? '🔼'
@@ -380,7 +382,7 @@ function LessonList() {
                     onClick={() => handleSort('updateTime')}
                     style={{ cursor: 'pointer' }}
                   >
-                    Create Time{' '}
+                    Update Time{' '}
                     {sortConfig.key === 'updateTime'
                       ? sortConfig.direction === 'asc'
                         ? '🔼'
@@ -391,20 +393,20 @@ function LessonList() {
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {dataLessonList?.data &&
-                  dataLessonList?.data.length > 0 &&
-                  dataLessonList?.data?.map((item) => (
-                    <CTableRow key={item.id}>
+                {dataLessonList &&
+                  dataLessonList?.length > 0 &&
+                  dataLessonList?.map((item, index) => (
+                    <CTableRow key={item.theory_id}>
                       <CTableHeaderCell scope="row">
                         <CFormCheck
-                          key={item?.id}
+                          key={item?.theory_id}
                           aria-label="Default select example"
-                          defaultChecked={item?.id}
-                          id={`flexCheckDefault_${item?.id}`}
-                          value={item?.id}
-                          checked={selectedUnDealCheckbox.includes(item?.id)}
+                          defaultChecked={item?.theory_id}
+                          id={`flexCheckDefault_${item?.theory_id}`}
+                          value={item?.theory_id}
+                          checked={selectedUnDealCheckbox.includes(item?.theory_id)}
                           onChange={(e) => {
-                            const undealId = item?.id
+                            const undealId = item?.theory_id
                             const isChecked = e.target.checked
                             if (isChecked) {
                               setSelectedUnDealCheckbox([...selectedUnDealCheckbox, undealId])
@@ -417,20 +419,21 @@ function LessonList() {
                         />
                       </CTableHeaderCell>
                       <CTableDataCell>
-                        <Link to={`/exams/edit?id=${item?.id}`}>{item.name}</Link>
+                        <Link to={`/exams/edit?id=${item?.theory_id}`}>{item.title}</Link>
                       </CTableDataCell>
                       <CTableDataCell>
                         <CImage
-                          src="https://cdn2.fptshop.com.vn/unsafe/Uploads/images/tin-tuc/153434/Originals/so-sanh-windows-11-home-vs-pro-01.jpg"
+                          src={`${imageBaseUrl}/${item.picture}`}
                           width={150}
-                          alt={item.name}
+                          alt={`Ảnh ${item.theory_id}`}
                         />
                       </CTableDataCell>
-                      <CTableDataCell>Window 11 bản quyền</CTableDataCell>
+                      <CTableDataCell>{item?.category?.title}</CTableDataCell>
 
                       <CTableDataCell>
                         {moment(item?.created_at).format('DD-MM-YYYY, hh:mm:ss A')}
                       </CTableDataCell>
+
                       <CTableDataCell>
                         {moment(item?.updated_at).format('DD-MM-YYYY, hh:mm:ss A')}
                       </CTableDataCell>
@@ -439,7 +442,7 @@ function LessonList() {
                         <div className="d-flex align-items-center gap-1">
                           <CButton
                             size="sm"
-                            onClick={() => handleEditClick(item.id)}
+                            onClick={() => handleEditClick(item.theory_id)}
                             className="button-action mr-2 bg-info"
                           >
                             <CIcon icon={cilColorBorder} className="text-white" />
@@ -467,7 +470,7 @@ function LessonList() {
       <CRow className="mt-3">
         <div className="d-flex justify-content-end">
           <ReactPaginate
-            pageCount={Math.ceil(dataLessonList.total / dataLessonList.per_page)}
+            pageCount={Math.ceil(lessonPagination.total / lessonPagination.per_page)}
             pageRangeDisplayed={3}
             marginPagesDisplayed={1}
             pageClassName="page-item"

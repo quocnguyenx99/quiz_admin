@@ -70,6 +70,7 @@ function AddExam() {
     {
       question_text: '',
       explanation: '',
+      question_type: 0,
       answers: [{ option_letter: 'A', option_text: '', is_correct: false }],
     },
   ])
@@ -83,9 +84,6 @@ function AddExam() {
   const initialValues = {
     title: '',
     friendlyUrl: '',
-    // pageTitle: '',
-    // metaKeyword: '',
-    // metaDesc: '',
     topicCategory: '',
     exam: '',
     duration: '',
@@ -103,17 +101,6 @@ function AddExam() {
         /^[a-z0-9-]+$/,
         'Chuỗi đường dẫn chỉ bao gồm chữ cái thường, số và dấu gạch ngang (-)',
       ),
-    // pageTitle: Yup.string()
-    //   .required('Tiêu đề trang là bắt buộc')
-    //   .max(60, 'Tiêu đề trang không được vượt quá 100 ký tự'),
-    // metaKeyword: Yup.string()
-    //   .required('Meta keywords là bắt buộc')
-    //   .max(150, 'Meta keywords không được vượt quá 150 ký tự'),
-    // metaDesc: Yup.string()
-    //   .required('Meta description là bắt buộc')
-    //   .max(200, 'Meta description không được vượt quá 200 ký tự'),
-    // topicCategory: Yup.string().required('Danh mục bài thi là bắt buộc'),
-    // exam: Yup.string().required('Danh mục bài thi là bắt buộc'),
     duration: Yup.number()
       .required('Thời gian làm bài là bắt buộc')
       .positive('Thời gian làm bài phải là số dương')
@@ -232,6 +219,23 @@ function AddExam() {
       newQs[qIndex].answers = newQs[qIndex].answers.map((ans, i) =>
         i === aIndex ? { ...ans, is_correct: !ans.is_correct } : ans,
       )
+      return newQs
+    })
+  }
+
+  const handleQuestionTypeChange = (qIndex, type) => {
+    setQuestions((prev) => {
+      const newQs = [...prev]
+      newQs[qIndex].question_type = type
+
+      if (type === 0) {
+        let firstCorrectIndex = newQs[qIndex].answers.findIndex((ans) => ans.is_correct)
+        newQs[qIndex].answers = newQs[qIndex].answers.map((ans, i) => ({
+          ...ans,
+          is_correct: i === firstCorrectIndex,
+        }))
+      }
+
       return newQs
     })
   }
@@ -399,6 +403,28 @@ function AddExam() {
                                   handleQuestionTextChange(qIndex, data)
                                 }}
                               />
+                              <div className="mt-3">
+                                <label>
+                                  <input
+                                    type="radio"
+                                    name={`questionType-${qIndex}`}
+                                    value={0}
+                                    checked={q.question_type === 0}
+                                    onChange={() => handleQuestionTypeChange(qIndex, 0)}
+                                  />{' '}
+                                  Chọn một đáp án đúng
+                                </label>
+                                <label className="ms-3">
+                                  <input
+                                    type="radio"
+                                    name={`questionType-${qIndex}`}
+                                    value={1}
+                                    checked={q.question_type === 1}
+                                    onChange={() => handleQuestionTypeChange(qIndex, 1)}
+                                  />{' '}
+                                  Chọn nhiều đáp án đúng
+                                </label>
+                              </div>
 
                               <h6 className="mt-3">Đáp án:</h6>
                               {q.answers.map((ans, aIndex) => (

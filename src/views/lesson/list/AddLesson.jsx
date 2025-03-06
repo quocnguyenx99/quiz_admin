@@ -62,7 +62,7 @@ function AddLesson() {
   const [editorData, setEditorData] = useState('')
 
   const [dataTopicCategories, setDataTopicCategories] = useState(topicCategoriesData)
-  const [selectedCateCheckbox, setSelectedCateCheckbox] = useState([])
+  // const [selectedCateCheckbox, setSelectedCateCheckbox] = useState([])
 
   // loading button
   const [isLoading, setIsLoading] = useState(false)
@@ -71,7 +71,7 @@ function AddLesson() {
     title: '',
     desc: '',
     friendlyUrl: '',
-    pageTitle: '',
+    topicCategory: '',
     metaKeyword: '',
     metaDesc: '',
     visible: 0,
@@ -81,7 +81,6 @@ function AddLesson() {
     title: Yup.string().required('Tiêu đề là bắt buộc.'),
     desc: Yup.string().required('Mô tả ngắn là bắt buộc.'),
     friendlyUrl: Yup.string().required('Friendly URL là bắt buộc.'),
-    pageTitle: Yup.string().required('Tiêu đề trang là bắt buộc.'),
     metaKeyword: Yup.string().required('Meta keyword là bắt buộc.'),
     metaDesc: Yup.string().required('Meta description là bắt buộc.'),
     visible: Yup.number()
@@ -91,7 +90,7 @@ function AddLesson() {
 
   const fetchDataTopicCategories = async () => {
     try {
-      const response = await axiosClient.get(`admin/news-category`)
+      const response = await axiosClient.get(`/theory-category`)
       if (response.data.status === true) {
         setDataTopicCategories(response.data.list)
       }
@@ -136,19 +135,16 @@ function AddLesson() {
   }
 
   const handleSubmit = async (values) => {
-    console.log('>>>>check values', values)
-
     try {
       setIsLoading(true)
-      const response = await axiosClient.post('admin/lesson', {
+      const response = await axiosClient.post('/theory', {
         title: values.title,
         description: editorData,
         short_description: values.desc,
         friendly_url: values.friendlyUrl,
-        friendly_title: values.pageTitle,
-        metakey: values.metaKeyword,
-        metadesc: values.metaDesc,
-        cat_id: selectedCateCheckbox,
+        meta_keywords: values.metaKeyword,
+        meta_description: values.metaDesc,
+        cat_id: values.topicCategory,
         picture: selectedFile,
         display: values.visible,
       })
@@ -252,7 +248,7 @@ function AddLesson() {
                           />
                         </CCol>
                         <br />
-                        <CCol md={12}>
+                        {/* <CCol md={12}>
                           <label htmlFor="pageTitle-input">Tiêu đề trang</label>
                           <Field
                             name="pageTitle"
@@ -263,7 +259,7 @@ function AddLesson() {
                           />
                           <ErrorMessage name="pageTitle" component="div" className="text-danger" />
                         </CCol>
-                        <br />
+                        <br /> */}
                         <CCol md={12}>
                           <label htmlFor="metaKeyword-input">Meta keywords</label>
                           <Field
@@ -324,8 +320,8 @@ function AddLesson() {
                             ...(Array.isArray(dataTopicCategories) &&
                               dataTopicCategories.length > 0 &&
                               dataTopicCategories.map((cate) => ({
-                                label: cate.name,
-                                value: cate.id,
+                                label: cate.title,
+                                value: cate.cat_id,
                               }))),
                           ]}
                         />
@@ -366,8 +362,8 @@ function AddLesson() {
                           as={CFormSelect}
                           id="visible-select"
                           options={[
-                            { label: 'Không', value: '0' },
-                            { label: 'Có', value: '1' },
+                            { label: 'Không', value: 0 },
+                            { label: 'Có', value: 1 },
                           ]}
                         />
                         <ErrorMessage name="visible" component="div" className="text-danger" />

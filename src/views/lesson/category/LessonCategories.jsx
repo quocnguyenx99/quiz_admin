@@ -66,8 +66,8 @@ function LessonCategories() {
   // loading button
   const [isLoading, setIsLoading] = useState(false)
 
-  const [dataLessonCategories, setDataLessonCategories] = useState(dataSample)
-  const [countLessonCategories, setCountLessonCategories] = useState(null)
+  const [dataLessonCategories, setDataLessonCategories] = useState([])
+  const [lessonPagination, setLessonPagination] = useState({})
 
   // show deleted Modal
   const [visible, setVisible] = useState(false)
@@ -110,10 +110,11 @@ function LessonCategories() {
   const fetchDataLessonCategories = async (dataSearch = '') => {
     try {
       const response = await axiosClient.get(
-        `admin/news-category?data=${dataSearch}&page=${pageNumber}`,
+        `/theory-category?data=${dataSearch}&page=${pageNumber}`,
       )
       if (response.data.status === true) {
         setDataLessonCategories(response.data.list)
+        setLessonPagination()
       }
     } catch (error) {
       console.error('Fetch data lesson categories error', error)
@@ -126,17 +127,14 @@ function LessonCategories() {
 
   const fetchDataById = async (setValues) => {
     try {
-      const response = await axiosClient.get(`admin/news-category/${id}/edit`)
-      const data = response.data.newsCategory
+      const response = await axiosClient.get(`/theory-category/${id}/edit`)
+      const data = response.data.data
       if (data) {
         setValues({
-          title: data?.news_category_desc.cat_name,
-          description: data?.news_category_desc.description,
-          friendlyUrl: data?.news_category_desc.friendly_url,
-          pageTitle: data?.news_category_desc.friendly_title,
-          metaKeyword: data?.news_category_desc.metakey,
-          metaDesc: data?.news_category_desc.metadesc,
-          visible: data.display,
+          title: data?.title,
+          description: data?.description,
+          friendlyUrl: data?.friendly_url,
+          visible: data?.display,
         })
       } else {
         console.error('No data found for the given ID.')
@@ -151,8 +149,8 @@ function LessonCategories() {
       //call api update data
       try {
         setIsLoading(true)
-        const response = await axiosClient.put(`admin/news-category/${id}`, {
-          cat_name: values.title,
+        const response = await axiosClient.put(`/theory-category/${id}`, {
+          title: values.title,
           description: values.description,
           friendly_url: values.friendlyUrl,
           display: values.visible,
@@ -176,8 +174,8 @@ function LessonCategories() {
       //call api post new data
       try {
         setIsLoading(true)
-        const response = await axiosClient.post('admin/news-category', {
-          cat_name: values.title,
+        const response = await axiosClient.post('/theory-category', {
+          title: values.title,
           description: values.description,
           friendly_url: values.friendlyUrl,
           display: values.visible,
@@ -210,7 +208,7 @@ function LessonCategories() {
   const handleDelete = async () => {
     setVisible(true)
     try {
-      const response = await axiosClient.delete(`admin/news-category/${deletedId}`)
+      const response = await axiosClient.delete(`/theory-category/${deletedId}`)
       if (response.data.status === true) {
         setVisible(false)
         fetchDataLessonCategories()
@@ -240,8 +238,9 @@ function LessonCategories() {
 
   const handleDeleteAll = async () => {
     try {
-      const response = await axiosClient.post(`admin/delete-all-news-category`, {
-        data: selectedCheckbox,
+      const response = await axiosClient.post(`/theory-categorys/delete`, {
+        _method: 'DELETE',
+        ids: selectedCheckbox,
       })
 
       if (response.data.status === true) {
@@ -259,14 +258,14 @@ function LessonCategories() {
       ? dataLessonCategories.map((item) => ({
           id: (
             <CFormCheck
-              key={item?.id}
+              key={item?.cat_id}
               aria-label="Default select example"
-              defaultChecked={item?.id}
-              id={`flexCheckDefault_${item?.id}`}
-              value={item?.id}
-              checked={selectedCheckbox.includes(item?.id)}
+              defaultChecked={item?.cat_id}
+              id={`flexCheckDefault_${item?.cat_id}`}
+              value={item?.cat_id}
+              checked={selectedCheckbox.includes(item?.cat_id)}
               onChange={(e) => {
-                const categoriesId = item?.id
+                const categoriesId = item?.cat_id
                 const isChecked = e.target.checked
                 if (isChecked) {
                   setSelectedCheckbox([...selectedCheckbox, categoriesId])
@@ -277,11 +276,11 @@ function LessonCategories() {
             />
           ),
           title: item?.title,
-          url: item?.url,
+          url: item?.friendly_url,
           actions: (
             <div className="d-flex align-items-center">
               <CButton
-                onClick={() => handleEditClick(item.id)}
+                onClick={() => handleEditClick(item.cat_id)}
                 className="button-action mr-2 bg-info"
               >
                 <CIcon icon={cilColorBorder} className="text-white" />
@@ -289,7 +288,7 @@ function LessonCategories() {
               <CButton
                 onClick={() => {
                   setVisible(true)
-                  setDeletedId(item.id)
+                  setDeletedId(item.cat_id)
                 }}
                 className="button-action bg-danger"
               >
@@ -312,7 +311,7 @@ function LessonCategories() {
             const isChecked = e.target.checked
             setIsAllCheckbox(isChecked)
             if (isChecked) {
-              const allIds = dataLessonCategories?.map((item) => item.id) || []
+              const allIds = dataLessonCategories?.map((item) => item.cat_id) || []
               setSelectedCheckbox(allIds)
             } else {
               setSelectedCheckbox([])
@@ -464,7 +463,7 @@ function LessonCategories() {
             <Search count={dataLessonCategories?.length} onSearchData={handleSearch} />
             <CCol md={12} className="mt-3">
               <CButton onClick={handleDeleteAll} color="primary" size="sm">
-                Xóa các mục chọn
+                Xóa mục đã chọn
               </CButton>
             </CCol>
             <CTable className="mt-2 border" columns={columns} items={items} />

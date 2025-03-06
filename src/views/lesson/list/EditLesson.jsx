@@ -64,7 +64,7 @@ function EditLesson() {
 
   // ckeditor state
   const [editorData, setEditorData] = useState('')
-  const [dataTopicCategories, setDataTopicCategories] = useState(topicCategoriesData)
+  const [dataTopicCategories, setDataTopicCategories] = useState([])
 
   // loading button
   const [isLoading, setIsLoading] = useState(false)
@@ -73,7 +73,6 @@ function EditLesson() {
     title: '',
     desc: '',
     friendlyUrl: '',
-    pageTitle: '',
     metaKeyword: '',
     metaDesc: '',
     topicCategory: '',
@@ -84,7 +83,6 @@ function EditLesson() {
     title: Yup.string().required('Tiêu đề là bắt buộc.'),
     desc: Yup.string().required('Mô tả ngắn là bắt buộc.'),
     friendlyUrl: Yup.string().required('Friendly URL là bắt buộc.'),
-    pageTitle: Yup.string().required('Tiêu đề trang là bắt buộc.'),
     metaKeyword: Yup.string().required('Meta keyword là bắt buộc.'),
     metaDesc: Yup.string().required('Meta description là bắt buộc.'),
     visible: Yup.number()
@@ -94,7 +92,7 @@ function EditLesson() {
 
   const fetchDataTopicCategories = async () => {
     try {
-      const response = await axiosClient.get(`admin/news-category`)
+      const response = await axiosClient.get(`/theory-category`)
       if (response.data.status === true) {
         setDataTopicCategories(response.data.list)
       }
@@ -109,22 +107,21 @@ function EditLesson() {
 
   const fetchDataById = async (setValues) => {
     try {
-      const response = await axiosClient.get(`admin/lesson/${id}/edit`)
+      const response = await axiosClient.get(`/theory/${id}/edit`)
 
       if (response.data && response.data.status === true) {
-        const data = response.data.lesson
+        const data = response.data.data
         setValues({
           title: data?.title,
-          desc: data?.desc,
+          desc: data?.short_description,
           friendlyUrl: data?.friendly_url,
-          pageTitle: data?.page_title,
-          metaKeyword: data?.meta_keyword,
-          metaDesc: data?.meta_desc,
-          topicCategory: data?.cat_id,
-          visible: data?.visible,
+          metaKeyword: data?.meta_keywords,
+          metaDesc: data?.meta_description,
+          topicCategory: data?.theory_id,
+          visible: data?.display,
         })
         setSelectedFile(data?.picture)
-        setEditorData(data?.content)
+        setEditorData(data?.description)
       } else {
         console.error('No data found for the given ID.')
       }
@@ -285,18 +282,7 @@ function EditLesson() {
                           />
                         </CCol>
                         <br />
-                        <CCol md={12}>
-                          <label htmlFor="pageTitle-input">Tiêu đề trang</label>
-                          <Field
-                            name="pageTitle"
-                            type="text"
-                            as={CFormInput}
-                            id="pageTitle-input"
-                            text="Độ dài của tiêu đề trang tối đa 60 ký tự."
-                          />
-                          <ErrorMessage name="pageTitle" component="div" className="text-danger" />
-                        </CCol>
-                        <br />
+
                         <CCol md={12}>
                           <label htmlFor="metaKeyword-input">Meta keywords</label>
                           <Field
@@ -354,12 +340,12 @@ function EditLesson() {
                           text="Lựa chọn danh mục sẽ hiển thị bài học ngoài trang chủ."
                           options={[
                             { label: 'Chọn danh mục', value: '', disabled: true },
-                            ...(Array.isArray(dataTopicCategories) &&
-                              dataTopicCategories.length > 0 &&
-                              dataTopicCategories.map((cate) => ({
-                                label: cate.name,
-                                value: cate.id,
-                              }))),
+                            ...(dataTopicCategories && dataTopicCategories.length > 0
+                              ? dataTopicCategories.map((cate) => ({
+                                  label: cate.title,
+                                  value: cate.cat_id,
+                                }))
+                              : []),
                           ]}
                         />
                         <ErrorMessage
@@ -399,8 +385,8 @@ function EditLesson() {
                           as={CFormSelect}
                           id="visible-select"
                           options={[
-                            { label: 'Không', value: '0' },
-                            { label: 'Có', value: '1' },
+                            { label: 'Không', value: 0 },
+                            { label: 'Có', value: 1 },
                           ]}
                         />
                         <ErrorMessage name="visible" component="div" className="text-danger" />

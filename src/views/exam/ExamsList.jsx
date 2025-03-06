@@ -27,52 +27,13 @@ import { cilColorBorder, cilTrash } from '@coreui/icons'
 import DeletedModal from '../../components/deletedModal/DeletedModal'
 import useDebounce from '../../helper/debounce'
 
-const topicCategoriesData = [
-  {
-    id: 1,
-    name: 'DELL',
-    theories: [
-      { id: 101, name: 'Bài thi 1 - DELL' },
-      { id: 102, name: 'Bài thi 2 - DELL' },
-      { id: 103, name: 'Bài thi 3 - DELL' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'ASUS',
-    theories: [
-      { id: 201, name: 'Bài thi 1 - ASUS' },
-      { id: 202, name: 'Bài thi 2 - ASUS' },
-      { id: 203, name: 'Bài thi 3 - ASUS' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'HP',
-    theories: [
-      { id: 301, name: 'Bài thi 1 - HP' },
-      { id: 302, name: 'Bài thi 2 - HP' },
-      { id: 303, name: 'Bài thi 3 - HP' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Microsoft',
-    children: [
-      { id: 401, name: 'Bài thi 1 - Microsoft' },
-      { id: 402, name: 'Bài thi 2 - Microsoft' },
-      { id: 403, name: 'Bài thi 3 - Microsoft' },
-    ],
-  },
-]
-
 function ExamsList() {
   // check permission state
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [dataExamsList, setDataExamsList] = useState([])
-  const [topicCategories, setTopicCategories] = useState(topicCategoriesData)
+  const [topicCategories, setTopicCategories] = useState([])
   const [selectedTopicCategory, setSelectedTopicCategory] = useState([])
 
   const initialPage = Number(searchParams.get('page')) || 1

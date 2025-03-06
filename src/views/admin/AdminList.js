@@ -3,14 +3,11 @@ import {
   CButton,
   CCol,
   CContainer,
-  CForm,
   CFormInput,
   CImage,
   CRow,
   CFormSelect,
   CTable,
-  CPagination,
-  CPaginationItem,
   CFormCheck,
   CSpinner,
 } from '@coreui/react'
@@ -41,9 +38,7 @@ function AdminList() {
   const [isEditing, setIsEditing] = useState(false)
   const inputRef = useRef(null)
 
-  const [dataRole, setDataRole] = useState([])
   const [adminListData, setAdminListData] = useState([])
-  const [roleChoosen, setRoleChoosen] = useState('')
 
   // loading button
   const [isLoadingButton, setIsLoadingButton] = useState(false)
@@ -76,16 +71,13 @@ function AdminList() {
     email: '',
     phone: '',
     displayName: '',
-    role: '',
   }
 
   const validationSchema = Yup.object({
     username: Yup.string().required('Tên đăng nhập là bắt buộc.'),
-    // password: Yup.string().required('Mật khẩu là bắt buộc.'),
     email: Yup.string().email('Địa chỉ email không hợp lệ.').required('Email là bắt buộc.'),
     phone: Yup.string().required('Số điện thoại là bắt buộc.'),
     displayName: Yup.string().required('Tên hiển thị là bắt buộc.'),
-    role: Yup.string().required('Vai trò là bắt buộc.'),
   })
 
   useEffect(() => {
@@ -107,11 +99,9 @@ function AdminList() {
       if (data && response.data.status === true) {
         setValues({
           username: data.username,
-          // password: '',
           email: data.email,
           displayName: data.display_name,
           phone: data.phone,
-          role: data?.roles[0].id,
         })
         setSelectedFile(data.avatar)
       } else {
@@ -122,26 +112,10 @@ function AdminList() {
     }
   }
 
-  const fetchAdminGroupData = async () => {
-    try {
-      const response = await axiosClient.get(`admin/role`)
-
-      if (response.data.status === true) {
-        setDataRole(response.data.roles)
-      }
-    } catch (error) {
-      console.error('Fetch role adminstrator data is error', error)
-    }
-  }
-
-  useEffect(() => {
-    fetchAdminGroupData()
-  }, [])
-
   const fetchAdminListData = async (dataSearch = '') => {
     try {
       const response = await axiosClient.get(
-        `/admin/information?data=${dataSearch}&page=${pageNumber}&role_id=${roleChoosen}`,
+        `/admin/information?data=${dataSearch}&page=${pageNumber}`,
       )
 
       if (response.data.status === true) {
@@ -158,7 +132,7 @@ function AdminList() {
 
   useEffect(() => {
     fetchAdminListData()
-  }, [pageNumber, roleChoosen])
+  }, [pageNumber])
 
   const handleSubmit = async (values, { resetForm }) => {
     if (isEditing) {
@@ -166,19 +140,16 @@ function AdminList() {
       try {
         setIsLoadingButton(true)
         const response = await axiosClient.put(`/admin/information/${id}`, {
-          // username: values.username,
-          // password: values.password,
           email: values.email,
           display_name: values.displayName,
           avatar: selectedFile,
           phone: values.phone,
-          role_id: values.role,
         })
         if (response.data.status === true) {
           toast.success('Cập nhật thông tin admin thành công!')
           resetForm()
           fetchAdminListData()
-          navigate('/admin/list')
+          navigate('/admin/adminList')
         }
 
         if (response.data.status === false && response.data.mess == 'no permission') {
@@ -200,7 +171,6 @@ function AdminList() {
           display_name: values.displayName,
           avatar: selectedFile,
           phone: values.phone,
-          role_id: values.role,
         })
 
         if (response.data.status === true) {
@@ -208,12 +178,8 @@ function AdminList() {
           resetForm()
           setFile([])
           setSelectedFile([])
-          navigate('/admin/list?sub=add')
+          navigate('/admin/adminList?sub=add')
           fetchAdminListData()
-        }
-
-        if (response.data.status === false && response.data.mess == 'no permission') {
-          toast.warn('Bạn không có quyền thực hiện tác vụ này!')
         }
       } catch (error) {
         console.error('Post data admin is error', error)
@@ -224,11 +190,11 @@ function AdminList() {
   }
 
   const handleAddNewClick = () => {
-    navigate('/admin/list?sub=add')
+    navigate('/admin/adminList?sub=add')
   }
 
   const handleEditClick = (id) => {
-    navigate(`/admin/list?id=${id}&sub=edit`)
+    navigate(`/admin/adminList?id=${id}&sub=edit`)
   }
 
   // delete row
@@ -336,11 +302,7 @@ function AdminList() {
             />
           ),
           username: <div className="blue-txt">{item.username}</div>,
-          role: item.roles && item?.roles.length > 0 ? item.roles[0].title : 'Không',
-          visited:
-            item.lastlogin !== '0'
-              ? moment.unix(item?.lastlogin).format('DD-MM-YYYY, hh:mm:ss A')
-              : 'Chưa từng đăng nhập',
+          mail: item.email,
           actions: (
             <div>
               <button
@@ -391,13 +353,8 @@ function AdminList() {
       _props: { scope: 'col' },
     },
     {
-      key: 'role',
-      label: 'Vai trò',
-      _props: { scope: 'col' },
-    },
-    {
-      key: 'visited',
-      label: 'Đăng nhập gần đây',
+      key: 'mail',
+      label: 'Email',
       _props: { scope: 'col' },
     },
     {
@@ -474,6 +431,7 @@ function AdminList() {
                           type="password"
                           as={CFormInput}
                           id="password-input"
+                          disabled={sub === 'edit' ? true : false}
                         />
                         <ErrorMessage name="password" component="div" className="text-danger" />
                       </CCol>
@@ -520,7 +478,7 @@ function AdminList() {
                         <div>
                           {file.length == 0 ? (
                             <div>
-                              <CImage src={`${imageBaseUrl}` + selectedFile} width={370} />
+                              <CImage src={`${imageBaseUrl}uploads/` + selectedFile} width={370} />
                             </div>
                           ) : (
                             file.map((item, index) => <CImage key={index} src={item} width={370} />)
@@ -529,7 +487,7 @@ function AdminList() {
                       </CCol>
                       <br />
 
-                      <CCol md={12}>
+                      {/* <CCol md={12}>
                         <label htmlFor="role-select">Vai trò</label>
                         <Field
                           name="role"
@@ -544,7 +502,7 @@ function AdminList() {
                         />
                         <ErrorMessage name="role" component="div" className="text-danger" />
                       </CCol>
-                      <br />
+                      <br /> */}
 
                       <CCol xs={12}>
                         <CButton color="primary" type="submit" size="sm" disabled={isLoadingButton}>
@@ -587,7 +545,7 @@ function AdminList() {
                         <td>Tổng cộng</td>
                         <td className="total-count">{adminListData?.total}</td>
                       </tr>
-                      <tr>
+                      {/* <tr>
                         <td>Lọc</td>
                         <td>
                           <CFormSelect
@@ -603,7 +561,7 @@ function AdminList() {
                             onChange={(e) => setRoleChoosen(e.target.value)}
                           />
                         </td>
-                      </tr>
+                      </tr> */}
                       <tr>
                         <td>Tìm kiếm</td>
                         <td>

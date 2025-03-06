@@ -17,9 +17,10 @@ import '../css/headerLogout.css'
 import { useNavigate } from 'react-router-dom'
 import { axiosClient, imageBaseUrl } from '../../axiosConfig'
 
+import Avartar from '../../assets/images/avatars/baby-three-vector-9-removebg-preview.png'
+
 const AppHeaderDropdown = () => {
   const username = localStorage.getItem('username')
-  const [avatar, setAvatar] = useState(null)
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -27,6 +28,7 @@ const AppHeaderDropdown = () => {
     navigate('/login')
   }
 
+  // const [avatar, setAvatar] = useState(null)
   // const fetchAdminInfo = async () => {
   //   try {
   //     const response = await axiosClient.get('/admin/information')
@@ -45,9 +47,9 @@ const AppHeaderDropdown = () => {
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end " className="py-0 pe-0" caret={false}>
-        <div className="d-flex gap-3 align-items-center">
+        <div className="d-flex gap-2 align-items-center">
           <strong>{username || 'Quốc Dev'}</strong>
-          <CAvatar src={`${imageBaseUrl}${avatar}`} size="md" />
+          <CAvatar src={Avartar} size="md" />
         </div>
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
