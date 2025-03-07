@@ -75,12 +75,15 @@ const Login = () => {
                       <div
                         style={{
                           textAlign: 'center',
-                          fontWeight: 500,
+                          fontWeight: 600,
                           marginBottom: 10,
+                          marginTop: 10,
                           textTransform: 'uppercase',
+                          fontFamily: 'Tahoma',
+                          fontSize: 18,
                         }}
                       >
-                        <p>Nguyên Kim Trắc nghiệm</p>
+                        <p>Nguyên Kim e-learning</p>
                       </div>
                       <CInputGroup className="mb-3">
                         <CInputGroupText>

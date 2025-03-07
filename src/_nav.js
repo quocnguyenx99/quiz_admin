@@ -95,7 +95,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Quản lý kết quả thi',
-        to: '/exams/result',
+        to: '/exams/resultsList',
       },
     ],
   },
@@ -109,7 +109,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Danh sách thành viên',
-        to: '/members/list',
+        to: '/members/membersList',
       },
     ],
   },

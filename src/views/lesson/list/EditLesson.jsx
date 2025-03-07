@@ -18,45 +18,6 @@ import CKedtiorCustom from '../../../components/customEditor/ckEditorCustom'
 import { axiosClient, imageBaseUrl } from '../../../axiosConfig'
 import { toast } from 'react-toastify'
 
-const topicCategoriesData = [
-  {
-    id: 1,
-    name: 'DELL',
-    theories: [
-      { id: 101, name: 'Bài thi 1 - DELL' },
-      { id: 102, name: 'Bài thi 2 - DELL' },
-      { id: 103, name: 'Bài thi 3 - DELL' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'ASUS',
-    theories: [
-      { id: 201, name: 'Bài thi 1 - ASUS' },
-      { id: 202, name: 'Bài thi 2 - ASUS' },
-      { id: 203, name: 'Bài thi 3 - ASUS' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'HP',
-    theories: [
-      { id: 301, name: 'Bài thi 1 - HP' },
-      { id: 302, name: 'Bài thi 2 - HP' },
-      { id: 303, name: 'Bài thi 3 - HP' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Microsoft',
-    children: [
-      { id: 401, name: 'Bài thi 1 - Microsoft' },
-      { id: 402, name: 'Bài thi 2 - Microsoft' },
-      { id: 403, name: 'Bài thi 3 - Microsoft' },
-    ],
-  },
-]
-
 function EditLesson() {
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
@@ -117,7 +78,7 @@ function EditLesson() {
           friendlyUrl: data?.friendly_url,
           metaKeyword: data?.meta_keywords,
           metaDesc: data?.meta_description,
-          topicCategory: data?.theory_id,
+          topicCategory: data?.cat_id,
           visible: data?.display,
         })
         setSelectedFile(data?.picture)
@@ -162,18 +123,15 @@ function EditLesson() {
   }
 
   const handleSubmit = async (values) => {
-    console.log('>>>>check values', values)
-
     try {
       setIsLoading(true)
-      const response = await axiosClient.put(`admin/lesson/${id}`, {
+      const response = await axiosClient.put(`/theory/${id}`, {
         title: values.title,
         description: editorData,
         short_description: values.desc,
         friendly_url: values.friendlyUrl,
-        friendly_title: values.pageTitle,
-        metakey: values.metaKeyword,
-        metadesc: values.metaDesc,
+        meta_keywords: values.metaKeyword,
+        meta_description: values.metaDesc,
         cat_id: values.topicCategory,
         picture: selectedFile,
         display: values.visible,
@@ -369,11 +327,26 @@ function EditLesson() {
                         <ErrorMessage name="avatar" component="div" className="text-danger" />
 
                         <div>
-                          {Array.isArray(file) &&
-                            file.length > 0 &&
+                          {file.length == 0 ? (
+                            <div>
+                              <CImage
+                                className="border"
+                                src={`${imageBaseUrl}${selectedFile}`}
+                                width={200}
+                                loading="lazy"
+                              />
+                            </div>
+                          ) : (
                             file.map((item, index) => (
-                              <CImage className="border" key={index} src={item} width={250} />
-                            ))}
+                              <CImage
+                                className="border"
+                                key={index}
+                                src={item}
+                                width={200}
+                                loading="lazy"
+                              />
+                            ))
+                          )}
                         </div>
                       </CCol>
                       <br />

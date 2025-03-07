@@ -41,7 +41,7 @@ const AppSidebar = () => {
       <CSidebarHeader className="border-bottom" style={{ justifyContent: 'center', padding: 0 }}>
         <CSidebarBrand to="/">
           <Link to={'/'}>
-            <CImage rounded src={logo} width={100} />
+            <CImage rounded src={logo} width={130} />
           </Link>
           <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
           {/* <CImage customClassName="sidebar-brand-narrow" rounded src={logo} width={30} /> */}

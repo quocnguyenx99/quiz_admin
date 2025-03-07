@@ -108,23 +108,6 @@ function LessonList() {
     window.scrollTo(0, 0)
   }
 
-  // handle sort table
-  const handleSort = (key) => {
-    let direction = 'asc'
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc'
-    }
-    setSortConfig({ key, direction })
-
-    const sortedData = [...dataLessonList].sort((a, b) => {
-      if (a[key] < b[key]) return direction === 'asc' ? -1 : 1
-      if (a[key] > b[key]) return direction === 'asc' ? 1 : -1
-      return 0
-    })
-
-    setDataLessonList(sortedData)
-  }
-
   const fetchDataTopicCategories = async () => {
     try {
       const response = await axiosClient.get(`/theory-category`)
@@ -314,7 +297,7 @@ function LessonList() {
         <CRow className="mt-2">
           <CCol>
             <CTable className="border">
-              <CTableHead>
+              <CTableHead color="primary">
                 <CTableRow>
                   <CTableHeaderCell scope="col">
                     <CFormCheck
@@ -337,12 +320,7 @@ function LessonList() {
                     onClick={() => handleSort('title')}
                     style={{ cursor: 'pointer' }}
                   >
-                    Tiêu đề{' '}
-                    {sortConfig.key === 'title'
-                      ? sortConfig.direction === 'asc'
-                        ? '🔼'
-                        : '🔽'
-                      : ''}
+                    Tiêu đề
                   </CTableHeaderCell>
 
                   <CTableHeaderCell
@@ -357,12 +335,7 @@ function LessonList() {
                     onClick={() => handleSort('category.name')}
                     style={{ cursor: 'pointer' }}
                   >
-                    Danh mục{' '}
-                    {sortConfig.key === 'category.name'
-                      ? sortConfig.direction === 'asc'
-                        ? '🔼'
-                        : '🔽'
-                      : ''}
+                    Danh mục
                   </CTableHeaderCell>
 
                   <CTableHeaderCell
@@ -370,24 +343,14 @@ function LessonList() {
                     onClick={() => handleSort('updateTime')}
                     style={{ cursor: 'pointer' }}
                   >
-                    Create Time{' '}
-                    {sortConfig.key === 'updateTime'
-                      ? sortConfig.direction === 'asc'
-                        ? '🔼'
-                        : '🔽'
-                      : ''}
+                    Create Time
                   </CTableHeaderCell>
                   <CTableHeaderCell
                     scope="col"
                     onClick={() => handleSort('updateTime')}
                     style={{ cursor: 'pointer' }}
                   >
-                    Update Time{' '}
-                    {sortConfig.key === 'updateTime'
-                      ? sortConfig.direction === 'asc'
-                        ? '🔼'
-                        : '🔽'
-                      : ''}
+                    Update Time
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col">Tác vụ</CTableHeaderCell>
                 </CTableRow>
@@ -419,16 +382,27 @@ function LessonList() {
                         />
                       </CTableHeaderCell>
                       <CTableDataCell>
-                        <Link to={`/exams/edit?id=${item?.theory_id}`}>{item.title}</Link>
+                        <Link to={`/exams/edit?id=${item?.theory_id}`}>
+                          <div className="blue-txt">{item.title}</div>
+                        </Link>
                       </CTableDataCell>
                       <CTableDataCell>
                         <CImage
                           src={`${imageBaseUrl}/${item.picture}`}
-                          width={150}
+                          width={120}
                           alt={`Ảnh ${item.theory_id}`}
                         />
                       </CTableDataCell>
-                      <CTableDataCell>{item?.category?.title}</CTableDataCell>
+                      <CTableDataCell>
+                        <div
+                          className="blue-txt"
+                          style={{
+                            fontWeight: 400,
+                          }}
+                        >
+                          {item?.category?.title}
+                        </div>
+                      </CTableDataCell>
 
                       <CTableDataCell>
                         {moment(item?.created_at).format('DD-MM-YYYY, hh:mm:ss A')}

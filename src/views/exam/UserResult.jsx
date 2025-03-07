@@ -4,7 +4,6 @@ import {
   CContainer,
   CFormCheck,
   CFormSelect,
-  CImage,
   CRow,
   CTable,
   CTableBody,
@@ -27,12 +26,11 @@ import { cilColorBorder, cilTrash } from '@coreui/icons'
 import DeletedModal from '../../components/deletedModal/DeletedModal'
 import useDebounce from '../../helper/debounce'
 
-function ExamsList() {
-  // check permission state
+function UserResultList() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const [dataExamsList, setDataExamsList] = useState([])
+  const [dataUserResult, setDataUserResult] = useState([])
   const [topicCategories, setTopicCategories] = useState([])
   const [selectedTopicCategory, setSelectedTopicCategory] = useState([])
 
@@ -84,25 +82,25 @@ function ExamsList() {
     fetchDataTopicCategories()
   }, [])
 
-  const fetchDataExamsList = async () => {
+  const fetchDataUserResult = async () => {
     try {
       setIsLoading(true)
       const response = await axiosClient.get(
-        `/admin/quiz?page=${pageNumber}&data=${dataSearch}&categroy=${selectedTopicCategory}`,
+        `/admin/result-exams?page=${pageNumber}&data=${dataSearch}`,
       )
       if (response.data.status === true) {
-        setDataExamsList(response.data.data)
+        setDataUserResult(response.data.data)
       }
     } catch (error) {
-      console.error('Fetch data exams list is error', error.message)
+      console.error('Fetch data member list error', error.message)
     } finally {
       setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchDataExamsList()
-  }, [pageNumber, debouncedSearchTerm, selectedTopicCategory])
+    fetchDataUserResult()
+  }, [pageNumber, debouncedSearchTerm])
 
   // handle toggle filter table
   const handleToggleCollapse = () => {
@@ -110,24 +108,24 @@ function ExamsList() {
   }
 
   const handleSearch = (keyword) => {
-    fetchDataExamsList(keyword)
+    fetchDataUserResult(keyword)
   }
 
   const handleEditClick = (id) => {
-    navigate(`/exams/edit?id=${id}`)
+    navigate(`/members/edit?id=${id}`)
   }
 
   // delete row
   const handleDelete = async () => {
     setVisible(true)
     try {
-      const response = await axiosClient.delete(`/admin/quiz/${deletedId}`)
+      const response = await axiosClient.delete(`/admin/member/${deletedId}`)
       if (response.data.status === true) {
         setVisible(false)
-        fetchDataExamsList()
+        fetchDataUserResult()
       }
     } catch (error) {
-      console.error('Delete exam id error', error)
+      console.error('Delete member id error', error)
       toast.error('Đã xảy ra lỗi khi xóa. Vui lòng thử lại!')
     }
   }
@@ -155,21 +153,7 @@ function ExamsList() {
 
       <CRow className="my-3">
         <CCol>
-          <h2>DANH SÁCH BÀI THI</h2>
-        </CCol>
-        <CCol md={{ span: 4, offset: 4 }}>
-          <div className="d-flex justify-content-end gap-3">
-            <Link to={`/exams/add`}>
-              <CButton color="primary" type="submit" size="sm">
-                Thêm mới
-              </CButton>
-            </Link>
-            <Link to={`/exams/examsList`}>
-              <CButton color="primary" type="submit" size="sm">
-                Danh sách
-              </CButton>
-            </Link>
-          </div>
+          <h3>DANH SÁCH KẾT QUẢ THI</h3>
         </CCol>
       </CRow>
 
@@ -192,12 +176,12 @@ function ExamsList() {
               <tbody>
                 <tr>
                   <td>Tổng cộng</td>
-                  <td className="total-count">{dataExamsList?.total}</td>
+                  <td className="total-count">{dataUserResult?.total}</td>
                 </tr>
                 <tr>
-                  <td>Lọc</td>
+                  <td>Lọc theo</td>
                   <td>
-                    <label>Chọn danh mục</label>
+                    <label>Chọn danh mục bài học</label>
                     <div
                       className="d-flex"
                       style={{
@@ -225,7 +209,7 @@ function ExamsList() {
                 <tr>
                   <td>Tìm kiếm</td>
                   <td>
-                    <strong>Tìm kiếm theo TIÊU ĐỀ BÀI THI, DANH MỤC BÀI THI</strong>
+                    <strong>Tìm kiếm từ khóa theo USERNAME, KẾT QUẢ</strong>
                     <input
                       type="text"
                       className="search-input"
@@ -256,14 +240,8 @@ function ExamsList() {
       ) : (
         <CRow className="mt-2">
           <CCol>
-            <CTable
-              className="border"
-              hover
-              style={{
-                fontSize: 13.5,
-              }}
-            >
-              <CTableHead color="primary">
+            <CTable className="border" hover>
+              <CTableHead style={{ fontSize: 13 }} color="primary">
                 <CTableRow>
                   <CTableHeaderCell scope="col">
                     <CFormCheck
@@ -273,7 +251,7 @@ function ExamsList() {
                         const isChecked = e.target.checked
                         setIsAllUnDealCheckbox(isChecked)
                         if (isChecked) {
-                          const allIds = dataExamsList?.map((item) => item.id) || []
+                          const allIds = dataUserResult?.map((item) => item.id) || []
                           setSelectedUnDealCheckbox(allIds)
                         } else {
                           setSelectedUnDealCheckbox([])
@@ -281,56 +259,35 @@ function ExamsList() {
                       }}
                     />
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('title')}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Tiêu đề
-                  </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('category.name')}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Danh mục
-                  </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('category.name')}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Bài thi
-                  </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('time')}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Cấu hình
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
+                    Họ Tên
                   </CTableHeaderCell>
 
-                  {/* <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('time')}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Điểm thưởng
-                  </CTableHeaderCell> */}
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('updateTime')}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Update Time
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
+                    Bài thi
                   </CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Tác vụ</CTableHeaderCell>
+
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
+                    Số lần thi
+                  </CTableHeaderCell>
+
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
+                    Kết quả
+                  </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
+                    Thời gian bắt đầu thi
+                  </CTableHeaderCell>
+
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
+                    Thời gian nộp bài
+                  </CTableHeaderCell>
+                  {/* <CTableHeaderCell scope="col">Tác vụ</CTableHeaderCell> */}
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {dataExamsList?.data &&
-                  dataExamsList?.data.length > 0 &&
-                  dataExamsList?.data?.map((item) => (
+                {dataUserResult?.data &&
+                  dataUserResult?.data?.length > 0 &&
+                  dataUserResult?.data?.map((item) => (
                     <CTableRow key={item.id}>
                       <CTableHeaderCell scope="row">
                         <CFormCheck
@@ -354,56 +311,47 @@ function ExamsList() {
                         />
                       </CTableHeaderCell>
                       <CTableDataCell>
-                        <Link to={`/exams/edit?id=${item?.id}`} className="blue-txt">
-                          {item.name}
-                        </Link>
+                        <div className="blue-txt">{item?.member?.username}</div>
                       </CTableDataCell>
                       <CTableDataCell>
                         <div
-                          style={{
-                            fontWeight: 500,
-                          }}
-                        >
-                          {item?.category_title}
-                        </div>
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div
-                          className="orange-txt"
+                          className="blue-txt"
                           style={{
                             fontWeight: 400,
                           }}
                         >
-                          {item?.theory_title}
+                          {item?.quiz?.name}
                         </div>
                       </CTableDataCell>
                       <CTableDataCell>
-                        <div>
-                          <span>Thời gian: </span>
-                          <span
-                            style={{
-                              fontWeight: 500,
-                            }}
-                          >
-                            {item?.time}
-                          </span>
-                        </div>
-                        <div>
-                          <span>Điểm thưởng: </span>
-                          <span
-                            style={{
-                              fontWeight: 500,
-                            }}
-                          >
-                            {item?.pointAward}
-                          </span>
-                        </div>
+                        <div>{item?.times}</div>
                       </CTableDataCell>
                       <CTableDataCell>
-                        {moment(item?.updated_at).format('DD-MM-YYYY, hh:mm:ss A')}
+                        <div>
+                          {item?.is_finish === 0 ? (
+                            <span className="orange-txt">Không đạt</span>
+                          ) : (
+                            <span
+                              style={{
+                                color: 'green',
+                                fontWeight: 600,
+                              }}
+                            >
+                              Pass
+                            </span>
+                          )}
+                        </div>
                       </CTableDataCell>
 
                       <CTableDataCell>
+                        {moment.unix(item?.time_start).format('DD-MM-YYYY, hh:mm:ss A')}
+                      </CTableDataCell>
+
+                      <CTableDataCell>
+                        {moment.unix(item?.time_end).format('DD-MM-YYYY, hh:mm:ss A')}
+                      </CTableDataCell>
+
+                      {/* <CTableDataCell>
                         <div className="d-flex align-items-center gap-1">
                           <CButton
                             size="sm"
@@ -423,7 +371,7 @@ function ExamsList() {
                             <CIcon icon={cilTrash} className="text-white" />
                           </CButton>
                         </div>
-                      </CTableDataCell>
+                      </CTableDataCell> */}
                     </CTableRow>
                   ))}
               </CTableBody>
@@ -435,7 +383,7 @@ function ExamsList() {
       <CRow className="mt-3">
         <div className="d-flex justify-content-end">
           <ReactPaginate
-            pageCount={Math.ceil(dataExamsList.total / dataExamsList.per_page)}
+            pageCount={Math.ceil(dataUserResult.total / dataUserResult.per_page)}
             pageRangeDisplayed={3}
             marginPagesDisplayed={1}
             pageClassName="page-item"
@@ -460,4 +408,4 @@ function ExamsList() {
   )
 }
 
-export default ExamsList
+export default UserResultList

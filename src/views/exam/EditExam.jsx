@@ -25,47 +25,8 @@ import CIcon from '@coreui/icons-react'
 import { cilLibraryAdd } from '@coreui/icons'
 import { duration } from 'moment'
 
-const topicCategories = [
-  {
-    id: 1,
-    name: 'DELL',
-    theories: [
-      { id: 101, name: 'Bài thi 1 - DELL' },
-      { id: 102, name: 'Bài thi 2 - DELL' },
-      { id: 103, name: 'Bài thi 3 - DELL' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'ASUS',
-    theories: [
-      { id: 201, name: 'Bài thi 1 - ASUS' },
-      { id: 202, name: 'Bài thi 2 - ASUS' },
-      { id: 203, name: 'Bài thi 3 - ASUS' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'HP',
-    theories: [
-      { id: 301, name: 'Bài thi 1 - HP' },
-      { id: 302, name: 'Bài thi 2 - HP' },
-      { id: 303, name: 'Bài thi 3 - HP' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Microsoft',
-    children: [
-      { id: 401, name: 'Bài thi 1 - Microsoft' },
-      { id: 402, name: 'Bài thi 2 - Microsoft' },
-      { id: 403, name: 'Bài thi 3 - Microsoft' },
-    ],
-  },
-]
-
 function EditExam() {
-  const [dataExam, setDataExam] = useState([])
+  const [dataTopicCategories, setDataTopicCategories] = useState([])
 
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
@@ -83,6 +44,7 @@ function EditExam() {
     title: '',
     friendlyUrl: '',
     topicCategory: '',
+    exam: '',
     duration: '',
     pointAward: '',
     visible: 0,
@@ -112,11 +74,12 @@ function EditExam() {
       .required('Hiển thị là bắt buộc')
       .oneOf([0, 1], 'Hiển thị phải là 0 hoặc 1'),
   })
+
   const fetchDataTopicCategory = async () => {
     try {
-      const response = await axiosClient.get(`admin/news-category`)
+      const response = await axiosClient.get(`theory-categories/show`)
       if (response.data.status === true) {
-        setDataExam(response.data.list)
+        setDataTopicCategories(response.data.data)
       }
     } catch (error) {
       console.error('Fetch data news is error', error)
@@ -128,10 +91,9 @@ function EditExam() {
   }, [])
 
   const transformData = (data) => {
-    console.log('>>>>check data', data)
-
     return data.map((q) => ({
       question_text: q.description,
+      question_type: q.question_type,
       explanation: '',
       answers: q.answer.map((ans) => ({
         option_letter: ans.letter,
@@ -154,6 +116,8 @@ function EditExam() {
           friendlyUrl: data?.friendly_url,
           duration: data?.time,
           pointAward: data?.pointAward,
+          topicCategory: data?.cat_id,
+          exam: data?.theory_id,
           visible: data?.display,
         })
         setQuestions(transformData(questions))
@@ -245,13 +209,39 @@ function EditExam() {
     })
   }
 
-  // Chọn đáp án đúng (nhiều đáp án)
-  const handleCheckCorrect = (qIndex, aIndex) => {
+  const handleCheckCorrect = (qIndex, aIndex, questionType) => {
     setQuestions((prev) => {
       const newQs = [...prev]
-      newQs[qIndex].answers = newQs[qIndex].answers.map((ans, i) =>
-        i === aIndex ? { ...ans, is_correct: !ans.is_correct } : ans,
-      )
+
+      if (questionType === 'single-choice') {
+        // Nếu chỉ chọn 1 đáp án đúng, set tất cả về false trừ cái đang chọn
+        newQs[qIndex].answers = newQs[qIndex].answers.map((ans, i) => ({
+          ...ans,
+          is_correct: i === aIndex,
+        }))
+      } else {
+        // Nếu chọn nhiều đáp án, toggle trạng thái
+        newQs[qIndex].answers[aIndex].is_correct = !newQs[qIndex].answers[aIndex].is_correct
+      }
+
+      return newQs
+    })
+  }
+
+  const handleQuestionTypeChange = (qIndex, type) => {
+    setQuestions((prev) => {
+      const newQs = [...prev]
+      newQs[qIndex].question_type = type
+
+      // Nếu đổi sang câu hỏi chọn 1 đáp án đúng thì chỉ giữ lại 1 đáp án đúng duy nhất
+      if (type === 'single-choice') {
+        let firstCorrectIndex = newQs[qIndex].answers.findIndex((ans) => ans.is_correct)
+        newQs[qIndex].answers = newQs[qIndex].answers.map((ans, i) => ({
+          ...ans,
+          is_correct: i === firstCorrectIndex,
+        }))
+      }
+
       return newQs
     })
   }
@@ -291,6 +281,8 @@ function EditExam() {
         questions: questions,
         duration: values.duration,
         pointAward: values.pointAward,
+        cat_id: values.topicCategory,
+        theory_id: values.exam,
         visible: values.visible,
       })
       if (response.data.status === true) {
@@ -334,8 +326,6 @@ function EditExam() {
     // Set file URLs for immediate preview
     setFile(fileUrls)
   }
-
-  console.log('>>>>check questions', questions)
 
   return (
     <CContainer>
@@ -411,16 +401,41 @@ function EditExam() {
                             <div key={qIndex} className="exam">
                               <h6 className="mt-3">Câu hỏi {qIndex + 1}:</h6>
                               <CKEditor
-                                config={{
-                                  height: 70,
-                                  versionCheck: false,
-                                }}
+                                config={{ height: 70, versionCheck: false }}
                                 initData={q.question_text}
                                 onChange={(event) => {
                                   const data = event.editor.getData()
                                   handleQuestionTextChange(qIndex, data)
                                 }}
                               />
+
+                              <div className="mt-3">
+                                <h6>Chọn loại câu hỏi:</h6>
+                                <label>
+                                  <input
+                                    type="radio"
+                                    name={`questionType-${qIndex}`}
+                                    value={'single-choice'}
+                                    checked={q.question_type === 'single-choice'}
+                                    onChange={() =>
+                                      handleQuestionTypeChange(qIndex, 'single-choice')
+                                    }
+                                  />{' '}
+                                  Chọn một đáp án đúng
+                                </label>
+                                <label className="ms-3">
+                                  <input
+                                    type="radio"
+                                    name={`questionType-${qIndex}`}
+                                    value={'multiple-choice'}
+                                    checked={q.question_type === 'multiple-choice'}
+                                    onChange={() =>
+                                      handleQuestionTypeChange(qIndex, 'multiple-choice')
+                                    }
+                                  />{' '}
+                                  Chọn nhiều đáp án đúng
+                                </label>
+                              </div>
 
                               <h6 className="mt-3">Đáp án:</h6>
                               {q.answers.map((ans, aIndex) => (
@@ -449,19 +464,11 @@ function EditExam() {
                                     </span>
                                   )}
                                   <div className="answer__option-letter">
-                                    <strong
-                                      style={{
-                                        fontSize: 16,
-                                      }}
-                                    >
-                                      {ans.option_letter}
-                                    </strong>
+                                    <strong style={{ fontSize: 16 }}>{ans.option_letter}</strong>
                                   </div>
                                   <div className="answer__option-text">
                                     <CFormTextarea
-                                      style={{
-                                        fontSize: 14,
-                                      }}
+                                      style={{ fontSize: 14 }}
                                       className="w-100"
                                       type="text"
                                       value={ans.option_text}
@@ -501,13 +508,11 @@ function EditExam() {
                                           className="answer__modal-btn"
                                           type="button"
                                           onClick={() => {
-                                            handleCheckCorrect(qIndex, aIndex)
+                                            handleCheckCorrect(qIndex, aIndex, q.question_type)
                                             closeMenu()
                                           }}
                                         >
-                                          {questions[qIndex].answers[aIndex].is_correct
-                                            ? '❌ Bỏ chọn'
-                                            : '✅ Chọn đúng'}
+                                          {ans.is_correct ? '❌ Bỏ chọn' : '✅ Chọn đúng'}
                                         </CButton>
                                       </div>
                                     )}
@@ -522,9 +527,7 @@ function EditExam() {
                                 onClick={() => handleAddAnswer(qIndex)}
                               >
                                 <CIcon
-                                  style={{
-                                    color: 'white',
-                                  }}
+                                  style={{ color: 'white' }}
                                   icon={cilLibraryAdd}
                                   className="me-1"
                                 />
@@ -580,11 +583,11 @@ function EditExam() {
                           id="topicCategory-select"
                           text="Lựa chọn danh mục sẽ hiển thị bài thi ngoài trang chủ."
                           options={
-                            topicCategories &&
-                            topicCategories.length > 0 &&
-                            topicCategories.map((cate) => ({
-                              label: cate.name,
-                              value: cate.id,
+                            dataTopicCategories &&
+                            dataTopicCategories.length > 0 &&
+                            dataTopicCategories.map((cate) => ({
+                              label: cate.title,
+                              value: cate.cat_id,
                             }))
                           }
                         />
@@ -622,11 +625,11 @@ function EditExam() {
                             text="Lựa chọn bài thi."
                           >
                             <option value="">Chọn bài thi</option>
-                            {topicCategories
-                              .filter((topic) => topic.id == values.topicCategory)[0]
-                              .theories.map((exam) => (
-                                <option key={exam.id} value={exam.id}>
-                                  {exam.name}
+                            {dataTopicCategories
+                              .filter((topic) => topic.cat_id == values.topicCategory)[0]
+                              ?.theories?.map((exam) => (
+                                <option key={exam.theory_id} value={exam.theory_id}>
+                                  {exam.title}
                                 </option>
                               ))}
                           </Field>
@@ -642,7 +645,7 @@ function EditExam() {
                           type="number"
                           as={CFormInput}
                           id="duration-input"
-                          text="Thời gian làm bài nên được đặt chẵn."
+                          text="Thời gian làm bài nên được đặt chẵn. Đơn vị phút."
                         />
                         <ErrorMessage name="duration" component="div" className="text-danger" />
                       </CCol>

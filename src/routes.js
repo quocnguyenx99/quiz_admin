@@ -19,12 +19,17 @@ const AdminLog = React.lazy(() => import('./views/admin/AdminLog'))
 const ExamsList = React.lazy(() => import('./views/exam/ExamsList'))
 const AddExam = React.lazy(() => import('./views/exam/AddExam'))
 const EditExam = React.lazy(() => import('./views/exam/EditExam'))
+const ResultsList = React.lazy(() => import('./views/exam/UserResult'))
 
 // TAB BÀI HỌC
 const LessonCategories = React.lazy(() => import('./views/lesson/category/LessonCategories'))
 const AddLesson = React.lazy(() => import('./views/lesson/list/AddLesson'))
 const EditLesson = React.lazy(() => import('./views/lesson/list/EditLesson'))
 const LessonsList = React.lazy(() => import('./views/lesson/list/LessonsList'))
+
+// TAB THÀNH VIÊN
+const EditMembers = React.lazy(() => import('./views/member/EditMember'))
+const MembersList = React.lazy(() => import('./views/member/MembersList'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -41,13 +46,16 @@ const routes = [
 
   { path: '/exams/examsList', name: 'ExamsList', element: ExamsList, exact: true },
   { path: '/exams/add', name: 'AddExam', element: AddExam, exact: true },
-  { path: '/exams/edit', name: 'EditExam', element: EditExam, exact: true },
+  { path: '/exams/resultsList', name: 'ResultsList', element: ResultsList, exact: true },
 
   { path: '/lessons/category', name: 'LessonCategories', element: LessonCategories, exact: true },
 
   { path: '/lessons/add', name: 'AddLesson', element: AddLesson, exact: true },
   { path: '/lessons/edit', name: 'EditLesson', element: EditLesson, exact: true },
   { path: '/lessons/lessonsList', name: 'LessonsList', element: LessonsList, exact: true },
+
+  { path: '/members/edit', name: 'EditMembers', element: EditMembers, exact: true },
+  { path: '/members/membersList', name: 'MembersList', element: MembersList, exact: true },
 ]
 
 export default routes
