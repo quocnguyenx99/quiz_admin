@@ -31,6 +31,11 @@ const LessonsList = React.lazy(() => import('./views/lesson/list/LessonsList'))
 const EditMembers = React.lazy(() => import('./views/member/EditMember'))
 const MembersList = React.lazy(() => import('./views/member/MembersList'))
 
+// TAB BANNERS
+const AdvertisesCategories = React.lazy(
+  () => import('./views/advertise/category/AdvertisesCategories'),
+)
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
 
@@ -56,6 +61,13 @@ const routes = [
 
   { path: '/members/edit', name: 'EditMembers', element: EditMembers, exact: true },
   { path: '/members/membersList', name: 'MembersList', element: MembersList, exact: true },
+
+  {
+    path: '/banners/category',
+    name: 'AdvertisesCategories',
+    element: AdvertisesCategories,
+    exact: true,
+  },
 ]
 
 export default routes
