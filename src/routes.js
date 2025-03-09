@@ -31,10 +31,16 @@ const LessonsList = React.lazy(() => import('./views/lesson/list/LessonsList'))
 const EditMembers = React.lazy(() => import('./views/member/EditMember'))
 const MembersList = React.lazy(() => import('./views/member/MembersList'))
 
+// TAB QUÀ TẶNG
+const Gift = React.lazy(() => import('./views/gift/GiftsCategories'))
+
 // TAB BANNERS
 const AdvertisesCategories = React.lazy(
   () => import('./views/advertise/category/AdvertisesCategories'),
 )
+const AddAdvertise = React.lazy(() => import('./views/advertise/list/AddAdvertisesList'))
+const EditAdvertise = React.lazy(() => import('./views/advertise/list/EditAdvertisesList'))
+const AdvertisesList = React.lazy(() => import('./views/advertise/list/AdvertisesList'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -51,6 +57,7 @@ const routes = [
 
   { path: '/exams/examsList', name: 'ExamsList', element: ExamsList, exact: true },
   { path: '/exams/add', name: 'AddExam', element: AddExam, exact: true },
+  { path: '/exams/edit', name: 'EditExam', element: EditExam, exact: true },
   { path: '/exams/resultsList', name: 'ResultsList', element: ResultsList, exact: true },
 
   { path: '/lessons/category', name: 'LessonCategories', element: LessonCategories, exact: true },
@@ -66,6 +73,34 @@ const routes = [
     path: '/banners/category',
     name: 'AdvertisesCategories',
     element: AdvertisesCategories,
+    exact: true,
+  },
+
+  {
+    path: '/banners/add',
+    name: 'AddAdvertise',
+    element: AddAdvertise,
+    exact: true,
+  },
+
+  {
+    path: '/banners/edit',
+    name: 'EditAdvertise',
+    element: EditAdvertise,
+    exact: true,
+  },
+
+  {
+    path: '/banners/bannersList',
+    name: 'AdvertisesList',
+    element: AdvertisesList,
+    exact: true,
+  },
+
+  {
+    path: '/gifts/category',
+    name: 'Gift',
+    element: Gift,
     exact: true,
   },
 ]

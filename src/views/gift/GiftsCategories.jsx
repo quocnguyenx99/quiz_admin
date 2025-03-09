@@ -7,6 +7,7 @@ import {
   CFormInput,
   CFormSelect,
   CFormTextarea,
+  CImage,
   CRow,
   CSpinner,
   CTable,
@@ -15,16 +16,16 @@ import {
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import Search from '../../../components/search/Search'
+import Search from '../../components/search/Search'
 
 import CIcon from '@coreui/icons-react'
 import { cilTrash, cilColorBorder } from '@coreui/icons'
 import ReactPaginate from 'react-paginate'
-import DeletedModal from '../../../components/deletedModal/DeletedModal'
+import DeletedModal from '../../components/deletedModal/DeletedModal'
 import { toast } from 'react-toastify'
-import { axiosClient } from '../../../axiosConfig'
+import { axiosClient, imageBaseUrl } from '../../axiosConfig'
 
-function LessonCategories() {
+function GiftsCategories() {
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -38,8 +39,7 @@ function LessonCategories() {
   // loading button
   const [isLoading, setIsLoading] = useState(false)
 
-  const [dataLessonCategories, setDataLessonCategories] = useState([])
-  const [lessonPagination, setLessonPagination] = useState({})
+  const [dataGift, setDataGift] = useState([])
 
   // show deleted Modal
   const [visible, setVisible] = useState(false)
@@ -55,18 +55,49 @@ function LessonCategories() {
   const initialValues = {
     title: '',
     description: '',
-    friendlyUrl: '',
+    rewardPoint: '',
     visible: 0,
   }
 
   const validationSchema = Yup.object({
     title: Yup.string().required('Tiêu đề là bắt buộc.'),
-    friendlyUrl: Yup.string().required('Chuỗi đường dẫn là bắt buộc.'),
+    rewardPoint: Yup.string().required('Cấu hình điểm thưởng nhận quà là bắt buộc.'),
     description: Yup.string().required('Mô tả là bắt buộc.'),
     visible: Yup.number()
       .required('Hiển thị là bắt buộc')
       .oneOf([0, 1], 'Hiển thị phải là 0 hoặc 1'),
   })
+
+  // upload image and show image
+  const [selectedFile, setSelectedFile] = useState('')
+  const [file, setFile] = useState([])
+
+  //set img avatar
+  function onFileChange(e) {
+    const files = e.target.files
+    const selectedFiles = []
+    const fileUrls = []
+
+    Array.from(files).forEach((file) => {
+      // Create a URL for the file
+      fileUrls.push(URL.createObjectURL(file))
+
+      // Read the file as base64
+      const fileReader = new FileReader()
+      fileReader.readAsDataURL(file)
+
+      fileReader.onload = (event) => {
+        selectedFiles.push(event.target.result)
+        // Set base64 data after all files have been read
+        if (selectedFiles.length === files.length) {
+          setSelectedFile(selectedFiles)
+        }
+      }
+    })
+
+    // Set file URLs for immediate preview
+    setFile(fileUrls)
+  }
 
   useEffect(() => {
     if (sub === 'add') {
@@ -79,14 +110,11 @@ function LessonCategories() {
     }
   }, [location.search])
 
-  const fetchDataLessonCategories = async (dataSearch = '') => {
+  const fetchDataGifts = async (dataSearch = '') => {
     try {
-      const response = await axiosClient.get(
-        `/theory-category?data=${dataSearch}&page=${pageNumber}`,
-      )
+      const response = await axiosClient.get(`/gift?data=${dataSearch}&page=${pageNumber}`)
       if (response.data.status === true) {
-        setDataLessonCategories(response.data.list)
-        setLessonPagination()
+        setDataGift(response.data.data)
       }
     } catch (error) {
       console.error('Fetch data lesson categories error', error)
@@ -94,25 +122,26 @@ function LessonCategories() {
   }
 
   useEffect(() => {
-    fetchDataLessonCategories()
+    fetchDataGifts()
   }, [pageNumber])
 
   const fetchDataById = async (setValues) => {
     try {
-      const response = await axiosClient.get(`/theory-category/${id}/edit`)
+      const response = await axiosClient.get(`/gift/${id}/edit`)
       const data = response.data.data
       if (data) {
         setValues({
           title: data?.title,
           description: data?.description,
-          friendlyUrl: data?.friendly_url,
+          rewardPoint: data?.reward_point,
           visible: data?.display,
         })
+        setSelectedFile(data?.picture)
       } else {
         console.error('No data found for the given ID.')
       }
     } catch (error) {
-      console.error('Fetch data id lesson category error', error.message)
+      console.error('Fetch data id gift category error', error.message)
     }
   }
 
@@ -121,18 +150,19 @@ function LessonCategories() {
       //call api update data
       try {
         setIsLoading(true)
-        const response = await axiosClient.put(`/theory-category/${id}`, {
+        const response = await axiosClient.put(`/gift/${id}`, {
           title: values.title,
           description: values.description,
-          friendly_url: values.friendlyUrl,
+          reward_point: values.rewardPoint,
+          picture: selectedFile,
           display: values.visible,
         })
         if (response.data.status === true) {
           toast.success('Cập nhật danh mục thành công')
           resetForm()
-          navigate('/lessons/category')
+          navigate('/gifts/category')
           setIsEditing(false)
-          fetchDataLessonCategories()
+          fetchDataGifts()
         } else {
           console.error('No data found for the given ID.')
         }
@@ -146,18 +176,19 @@ function LessonCategories() {
       //call api post new data
       try {
         setIsLoading(true)
-        const response = await axiosClient.post('/theory-category', {
+        const response = await axiosClient.post('/gift', {
           title: values.title,
           description: values.description,
-          friendly_url: values.friendlyUrl,
+          reward_point: values.rewardPoint,
+          picture: selectedFile,
           display: values.visible,
         })
 
         if (response.data.status === true) {
           toast.success('Thêm mới danh mục thành công!')
           resetForm()
-          navigate('/lessons/category?sub=add')
-          fetchDataLessonCategories()
+          navigate('/gifts/category?sub=add')
+          fetchDataGifts()
         }
       } catch (error) {
         console.error('Post data lesson category is error', error)
@@ -169,21 +200,21 @@ function LessonCategories() {
   }
 
   const handleAddNewClick = () => {
-    navigate('/lessons/category?sub=add')
+    navigate('/gifts/category?sub=add')
   }
 
   const handleEditClick = (id) => {
-    navigate(`/lessons/category?id=${id}&sub=edit`)
+    navigate(`/gifts/category?id=${id}&sub=edit`)
   }
 
   // delete row
   const handleDelete = async () => {
     setVisible(true)
     try {
-      const response = await axiosClient.delete(`/theory-category/${deletedId}`)
+      const response = await axiosClient.delete(`/gift/${deletedId}`)
       if (response.data.status === true) {
         setVisible(false)
-        fetchDataLessonCategories()
+        fetchDataGifts()
       }
     } catch (error) {
       console.error('Delete lesson category id is error', error)
@@ -205,19 +236,19 @@ function LessonCategories() {
 
   // search Data
   const handleSearch = (keyword) => {
-    fetchDataLessonCategories(keyword)
+    fetchDataGifts(keyword)
   }
 
   const handleDeleteAll = async () => {
     try {
-      const response = await axiosClient.post(`/theory-categorys/delete`, {
+      const response = await axiosClient.post(`/gifts/delete`, {
         _method: 'DELETE',
         ids: selectedCheckbox,
       })
 
       if (response.data.status === true) {
         toast.success('Xóa tất cả danh mục thành công!')
-        fetchDataLessonCategories()
+        fetchDataGifts()
         setSelectedCheckbox([])
       }
     } catch (error) {
@@ -226,18 +257,18 @@ function LessonCategories() {
   }
 
   const items =
-    dataLessonCategories && dataLessonCategories?.length > 0
-      ? dataLessonCategories.map((item) => ({
+    dataGift && dataGift?.length > 0
+      ? dataGift.map((item) => ({
           id: (
             <CFormCheck
-              key={item?.cat_id}
+              key={item?.id}
               aria-label="Default select example"
-              defaultChecked={item?.cat_id}
-              id={`flexCheckDefault_${item?.cat_id}`}
-              value={item?.cat_id}
-              checked={selectedCheckbox.includes(item?.cat_id)}
+              defaultChecked={item?.id}
+              id={`flexCheckDefault_${item?.id}`}
+              value={item?.id}
+              checked={selectedCheckbox.includes(item?.id)}
               onChange={(e) => {
-                const categoriesId = item?.cat_id
+                const categoriesId = item?.id
                 const isChecked = e.target.checked
                 if (isChecked) {
                   setSelectedCheckbox([...selectedCheckbox, categoriesId])
@@ -248,11 +279,14 @@ function LessonCategories() {
             />
           ),
           title: item?.title,
-          url: item?.friendly_url,
+          picture: (
+            <CImage src={`${imageBaseUrl}/uploads/${item.picture}`} width={100} alt={item.id} />
+          ),
+          rewardPoints: item.reward_point,
           actions: (
             <div className="d-flex align-items-center">
               <CButton
-                onClick={() => handleEditClick(item.cat_id)}
+                onClick={() => handleEditClick(item.id)}
                 className="button-action mr-2 bg-info"
               >
                 <CIcon icon={cilColorBorder} className="text-white" />
@@ -260,7 +294,7 @@ function LessonCategories() {
               <CButton
                 onClick={() => {
                   setVisible(true)
-                  setDeletedId(item.cat_id)
+                  setDeletedId(item.id)
                 }}
                 className="button-action bg-danger"
               >
@@ -283,7 +317,7 @@ function LessonCategories() {
             const isChecked = e.target.checked
             setIsAllCheckbox(isChecked)
             if (isChecked) {
-              const allIds = dataLessonCategories?.map((item) => item.cat_id) || []
+              const allIds = dataGift?.map((item) => item.id) || []
               setSelectedCheckbox(allIds)
             } else {
               setSelectedCheckbox([])
@@ -299,8 +333,14 @@ function LessonCategories() {
     },
 
     {
-      key: 'url',
-      label: 'Chuỗi đường dẫn',
+      key: 'picture',
+      label: 'Hình ảnh',
+      _props: { scope: 'col' },
+    },
+
+    {
+      key: 'rewardPoints',
+      label: 'Điểm thưởng',
       _props: { scope: 'col' },
     },
     {
@@ -316,20 +356,11 @@ function LessonCategories() {
         <DeletedModal visible={visible} setVisible={setVisible} onDelete={handleDelete} />
         <CRow className="mb-3">
           <CCol md={6}>
-            <h2>DANH MỤC BÀI HỌC</h2>
+            <h2>DANH MỤC QUÀ TẶNG</h2>
           </CCol>
           <CCol md={6}>
             <div className="d-flex justify-content-end">
-              <CButton
-                onClick={handleAddNewClick}
-                color="primary"
-                type="submit"
-                size="sm"
-                className="button-add"
-              >
-                Thêm mới
-              </CButton>
-              <Link to={'/lessons/category'}>
+              <Link to={'/gifts/category'}>
                 <CButton color="primary" type="submit" size="sm">
                   Danh sách
                 </CButton>
@@ -382,18 +413,52 @@ function LessonCategories() {
                       <ErrorMessage name="description" component="div" className="text-danger" />
                     </CCol>
                     <br />
-                    <h6>Search Engine Optimization</h6>
+
+                    <CCol md={12}>
+                      <label htmlFor="rewardPoint-input">Điểm thưởng nhận quà</label>
+                      <Field
+                        name="rewardPoint"
+                        type="number"
+                        as={CFormInput}
+                        id="rewardPoint-input"
+                        text="Điểm thưởng cấu hình để nhận quà."
+                      />
+                      <ErrorMessage name="rewardPoint" component="div" className="text-danger" />
+                    </CCol>
                     <br />
                     <CCol md={12}>
-                      <label htmlFor="url-input">Chuỗi đường dẫn</label>
-                      <Field
-                        name="friendlyUrl"
-                        type="text"
-                        as={CFormInput}
-                        id="url-input"
-                        text="Chuỗi dẫn tĩnh là phiên bản của tên hợp chuẩn với Đường dẫn (URL). Chuỗi này bao gồm chữ cái thường, số và dấu gạch ngang (-). VD: vi-tinh-nguyen-kim-to-chuc-su-kien-tri-an-dip-20-nam-thanh-lap"
+                      <CFormInput
+                        name="avatar"
+                        type="file"
+                        id="formFile"
+                        label="Ảnh đại diện"
+                        size="sm"
+                        onChange={(e) => onFileChange(e)}
                       />
-                      <ErrorMessage name="friendlyUrl" component="div" className="text-danger" />
+                      <br />
+
+                      <div>
+                        {file.length == 0 ? (
+                          <div>
+                            <CImage
+                              className="border"
+                              src={`${imageBaseUrl}/uploads/${selectedFile}`}
+                              fluid
+                              loading="lazy"
+                            />
+                          </div>
+                        ) : (
+                          file.map((item, index) => (
+                            <CImage
+                              className="border"
+                              key={index}
+                              src={item}
+                              fluid
+                              loading="lazy"
+                            />
+                          ))
+                        )}
+                      </div>
                     </CCol>
                     <br />
 
@@ -432,7 +497,7 @@ function LessonCategories() {
           </CCol>
 
           <CCol>
-            <Search count={dataLessonCategories?.length} onSearchData={handleSearch} />
+            <Search count={dataGift?.length} onSearchData={handleSearch} />
             <CCol md={12} className="mt-3">
               <CButton onClick={handleDeleteAll} color="primary" size="sm">
                 Xóa mục đã chọn
@@ -442,7 +507,7 @@ function LessonCategories() {
 
             <div className="d-flex justify-content-end">
               <ReactPaginate
-                pageCount={Math.ceil(dataLessonCategories?.length / 10)}
+                pageCount={Math.ceil(dataGift?.length / 10)}
                 pageRangeDisplayed={3}
                 marginPagesDisplayed={1}
                 pageClassName="page-item"
@@ -468,4 +533,4 @@ function LessonCategories() {
   )
 }
 
-export default LessonCategories
+export default GiftsCategories

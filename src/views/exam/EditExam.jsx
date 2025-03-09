@@ -167,6 +167,10 @@ function EditExam() {
     ])
   }
 
+  const handleRemoveQuestion = (qIndex) => {
+    setQuestions((prevQuestions) => prevQuestions.filter((_, index) => index !== qIndex))
+  }
+
   // Xử lý nhập text câu hỏi
   const handleQuestionTextChange = (qIndex, value) => {
     setQuestions((prev) => {
@@ -399,7 +403,22 @@ function EditExam() {
                         <div className="border p-2 rounded bg-white">
                           {questions.map((q, qIndex) => (
                             <div key={qIndex} className="exam">
-                              <h6 className="mt-3">Câu hỏi {qIndex + 1}:</h6>
+                              {/* Tiêu đề câu hỏi */}
+                              <div className="d-flex justify-content-between align-items-center">
+                                <h6 className="mt-3">Câu hỏi {qIndex + 1}:</h6>
+                                <CButton
+                                  style={{
+                                    color: 'white',
+                                  }}
+                                  color="danger"
+                                  size="sm"
+                                  onClick={() => handleRemoveQuestion(qIndex)}
+                                >
+                                  ❌ Xóa câu hỏi
+                                </CButton>
+                              </div>
+
+                              {/* CKEditor nhập câu hỏi */}
                               <CKEditor
                                 config={{ height: 70, versionCheck: false }}
                                 initData={q.question_text}
@@ -409,6 +428,7 @@ function EditExam() {
                                 }}
                               />
 
+                              {/* Chọn loại câu hỏi */}
                               <div className="mt-3">
                                 <h6>Chọn loại câu hỏi:</h6>
                                 <label>
@@ -437,6 +457,7 @@ function EditExam() {
                                 </label>
                               </div>
 
+                              {/* Danh sách đáp án */}
                               <h6 className="mt-3">Đáp án:</h6>
                               {q.answers.map((ans, aIndex) => (
                                 <div
@@ -519,6 +540,8 @@ function EditExam() {
                                   </div>
                                 </div>
                               ))}
+
+                              {/* Nút thêm đáp án */}
                               <CButton
                                 className="mt-3"
                                 color="primary"
@@ -537,6 +560,7 @@ function EditExam() {
                           ))}
                         </div>
 
+                        {/* Nút thêm câu hỏi */}
                         <CButton
                           className="mt-3 text-white"
                           color="danger"
