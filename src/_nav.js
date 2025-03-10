@@ -127,8 +127,8 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Danh sách nhận quà',
-        to: '/gifts/giftsList',
+        name: 'Danh sách đổi quà',
+        to: '/gifts/reward-history',
       },
     ],
   },

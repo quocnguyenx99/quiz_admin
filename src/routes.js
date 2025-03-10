@@ -33,6 +33,7 @@ const MembersList = React.lazy(() => import('./views/member/MembersList'))
 
 // TAB QUÀ TẶNG
 const Gift = React.lazy(() => import('./views/gift/GiftsCategories'))
+const RewardHistory = React.lazy(() => import('./views/gift/UserGotGift'))
 
 // TAB BANNERS
 const AdvertisesCategories = React.lazy(
@@ -61,7 +62,6 @@ const routes = [
   { path: '/exams/resultsList', name: 'ResultsList', element: ResultsList, exact: true },
 
   { path: '/lessons/category', name: 'LessonCategories', element: LessonCategories, exact: true },
-
   { path: '/lessons/add', name: 'AddLesson', element: AddLesson, exact: true },
   { path: '/lessons/edit', name: 'EditLesson', element: EditLesson, exact: true },
   { path: '/lessons/lessonsList', name: 'LessonsList', element: LessonsList, exact: true },
@@ -101,6 +101,13 @@ const routes = [
     path: '/gifts/category',
     name: 'Gift',
     element: Gift,
+    exact: true,
+  },
+
+  {
+    path: '/gifts/reward-history',
+    name: 'RewardHistory',
+    element: RewardHistory,
     exact: true,
   },
 ]
