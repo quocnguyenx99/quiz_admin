@@ -401,7 +401,11 @@ function EditExam() {
                             <div key={qIndex} className="exam">
                               <h6 className="mt-3">Câu hỏi {qIndex + 1}:</h6>
                               <CKEditor
-                                config={{ height: 70, versionCheck: false }}
+                                config={{
+                                  height: 70,
+                                  versionCheck: false,
+                                  extraPlugins: 'image2',
+                                }}
                                 initData={q.question_text}
                                 onChange={(event) => {
                                   const data = event.editor.getData()

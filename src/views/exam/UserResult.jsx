@@ -13,18 +13,18 @@ import {
   CTableRow,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import ReactPaginate from 'react-paginate'
 import moment from 'moment'
 import { toast } from 'react-toastify'
 
 import Loading from '../../components/loading/Loading'
-import { axiosClient, imageBaseUrl } from '../../axiosConfig'
-import CIcon from '@coreui/icons-react'
-import { cilColorBorder, cilTrash } from '@coreui/icons'
+import { axiosClient } from '../../axiosConfig'
 import DeletedModal from '../../components/deletedModal/DeletedModal'
 import useDebounce from '../../helper/debounce'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 function UserResultList() {
   const navigate = useNavigate()
@@ -36,6 +36,11 @@ function UserResultList() {
 
   const initialPage = Number(searchParams.get('page')) || 1
   const [pageNumber, setPageNumber] = useState(initialPage)
+
+  // date picker
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [errors, setErrors] = useState({ startDate: '', endDate: '' })
 
   //loading
   const [isLoading, setIsLoading] = useState(false)
@@ -57,6 +62,36 @@ function UserResultList() {
 
   // sort filter table
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
+
+  // convert string to timestamp
+  const convertStringToTimeStamp = (dateString) => {
+    if (dateString == '') {
+      return ''
+    } else {
+      const dateMoment = moment(dateString, 'ddd MMM DD YYYY HH:mm:ss GMTZ')
+      return dateMoment.unix()
+    }
+  }
+
+  // validate for date start - date end
+  const validateDates = (start, end) => {
+    const newErrors = { startDate: '', endDate: '' }
+    if (start && end && start > end) {
+      newErrors.startDate = 'Ngày bắt đầu không được sau ngày kết thúc'
+      newErrors.endDate = 'Ngày kết thúc không được trước ngày bắt đầu'
+    }
+    setErrors(newErrors)
+  }
+
+  const handleStartDateChange = (date) => {
+    setStartDate(date)
+    validateDates(date, endDate)
+  }
+
+  const handleEndDateChange = (date) => {
+    setEndDate(date)
+    validateDates(startDate, date)
+  }
 
   // pagination
   const handlePageChange = ({ selected }) => {
@@ -150,7 +185,6 @@ function UserResultList() {
   return (
     <CContainer>
       <DeletedModal visible={visible} setVisible={setVisible} onDelete={handleDelete} />
-
       <CRow className="my-3">
         <CCol>
           <h3>DANH SÁCH KẾT QUẢ THI</h3>
@@ -177,6 +211,31 @@ function UserResultList() {
                 <tr>
                   <td>Tổng cộng</td>
                   <td className="total-count">{dataUserResult?.total}</td>
+                </tr>
+
+                <tr>
+                  <td>Theo ngày</td>
+                  <td>
+                    <div className="custom-datepicker-wrapper">
+                      <DatePicker
+                        className="custom-datepicker"
+                        dateFormat={'dd-MM-yyyy'}
+                        showIcon
+                        selected={startDate}
+                        onChange={handleStartDateChange}
+                      />
+                      <p className="datepicker-label">{'đến ngày'}</p>
+                      <DatePicker
+                        className="custom-datepicker"
+                        dateFormat={'dd-MM-yyyy'}
+                        showIcon
+                        selected={endDate}
+                        onChange={handleEndDateChange}
+                      />
+                    </div>
+                    {errors.startDate && <span className="text-danger">{errors.startDate}</span>}
+                    {errors.endDate && <span className="text-danger">{errors.endDate}</span>}
+                  </td>
                 </tr>
                 <tr>
                   <td>Lọc theo</td>

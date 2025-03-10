@@ -331,7 +331,7 @@ function EditLesson() {
                             <div>
                               <CImage
                                 className="border"
-                                src={`${imageBaseUrl}${selectedFile}`}
+                                src={`${imageBaseUrl}/${selectedFile}`}
                                 width={200}
                                 loading="lazy"
                               />

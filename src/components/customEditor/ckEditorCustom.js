@@ -14,7 +14,7 @@ function CKedtiorCustom({ data, onChangeData, height }) {
       config={{
         versionCheck: false,
         height: height,
-        extraPlugins: 'justify',
+        extraPlugins: ['image2', 'colorbutton'],
         filebrowserBrowseUrl: 'https://admin.chinhnhan.net/ckfinder/ckfinder.html',
         filebrowserImageBrowseUrl: 'https://admin.chinhnhan.net/ckfinder/ckfinder.html?type=Images',
         filebrowserUploadUrl:

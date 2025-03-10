@@ -50,12 +50,12 @@ function EditMember() {
     phone: Yup.string()
       .matches(/^\d{10}$/, 'Số điện thoại không hợp lệ.')
       .required('Số điện thoại là bắt buộc'),
-    point: Yup.number()
-      .min(0, 'Điểm thưởng ít nhất phải là 0')
-      .required('Điểm thưởng là bắt buộc.'),
-    pointUsed: Yup.number()
-      .min(0, 'Điểm thưởng đã sử dụng ít nhất phải là 0')
-      .required('Điểm đã sử dụng là bắt buộc.'),
+    // point: Yup.number()
+    //   .min(0, 'Điểm thưởng ít nhất phải là 0')
+    //   .required('Điểm thưởng là bắt buộc.'),
+    // pointUsed: Yup.number()
+    //   .min(0, 'Điểm thưởng đã sử dụng ít nhất phải là 0')
+    //   .required('Điểm đã sử dụng là bắt buộc.'),
   })
 
   const fetchDataById = async (setValues) => {
@@ -65,7 +65,7 @@ function EditMember() {
       if (response.data && response.data.status === true) {
         const data = response.data.data
         setValues({
-          fullName: data?.username,
+          fullName: data?.full_name,
           companyName: data?.nameCompany,
           taxCode: data?.tax,
           email: data?.email,

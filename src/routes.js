@@ -46,6 +46,7 @@ const routes = [
 
   { path: '/exams/examsList', name: 'ExamsList', element: ExamsList, exact: true },
   { path: '/exams/add', name: 'AddExam', element: AddExam, exact: true },
+  { path: '/exams/edit', name: 'EditExam', element: EditExam, exact: true },
   { path: '/exams/resultsList', name: 'ResultsList', element: ResultsList, exact: true },
 
   { path: '/lessons/category', name: 'LessonCategories', element: LessonCategories, exact: true },
