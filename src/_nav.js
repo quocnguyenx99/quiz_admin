@@ -147,7 +147,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Danh sách banner',
-        to: '/banners/giftsList',
+        to: '/banners/bannersList',
       },
     ],
   },
