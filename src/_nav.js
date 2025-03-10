@@ -9,6 +9,7 @@ import {
   cilGift,
   cilImage,
   cilListRich,
+  cilMonitor,
   cilNotes,
   cilSpeedometer,
   cilUser,
@@ -148,6 +149,20 @@ const _nav = [
         component: CNavItem,
         name: 'Danh sách banner',
         to: '/banners/bannersList',
+      },
+    ],
+  },
+
+  {
+    component: CNavGroup,
+    name: 'QUẢN LÝ SẢN PHẨM',
+    to: '/products',
+    icon: <CIcon icon={cilMonitor} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Danh sách banner',
+        to: '/products/productsList',
       },
     ],
   },

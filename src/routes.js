@@ -43,6 +43,11 @@ const AddAdvertise = React.lazy(() => import('./views/advertise/list/AddAdvertis
 const EditAdvertise = React.lazy(() => import('./views/advertise/list/EditAdvertisesList'))
 const AdvertisesList = React.lazy(() => import('./views/advertise/list/AdvertisesList'))
 
+// TAB SẢN PHẨM
+const ProductsList = React.lazy(() => import('./views/products/ProductsList'))
+const AddProduct = React.lazy(() => import('./views/products/AddProduct'))
+const EditProduct = React.lazy(() => import('./views/products/EditProduct'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
 
@@ -110,6 +115,10 @@ const routes = [
     element: RewardHistory,
     exact: true,
   },
+
+  { path: '/products/add', name: 'AddProduct', element: AddProduct, exact: true },
+  { path: '/products/edit', name: 'EditProduct', element: EditProduct, exact: true },
+  { path: '/products/productsList', name: 'ProductsList', element: ProductsList, exact: true },
 ]
 
 export default routes

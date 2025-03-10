@@ -20,60 +20,18 @@ import ReactPaginate from 'react-paginate'
 import moment from 'moment'
 import { toast } from 'react-toastify'
 
-import Loading from '../../../components/loading/Loading'
-import { axiosClient, imageBaseUrl } from '../../../axiosConfig'
+import Loading from '../../components/loading/Loading'
+import { axiosClient, imageBaseUrl } from '../../axiosConfig'
 import CIcon from '@coreui/icons-react'
 import { cilColorBorder, cilTrash } from '@coreui/icons'
-import DeletedModal from '../../../components/deletedModal/DeletedModal'
-import useDebounce from '../../../helper/debounce'
+import DeletedModal from '../../components/deletedModal/DeletedModal'
+import useDebounce from '../../helper/debounce'
 
-const topicCategoriesData = [
-  {
-    id: 1,
-    name: 'DELL',
-    theories: [
-      { id: 101, name: 'Bài thi 1 - DELL' },
-      { id: 102, name: 'Bài thi 2 - DELL' },
-      { id: 103, name: 'Bài thi 3 - DELL' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'ASUS',
-    theories: [
-      { id: 201, name: 'Bài thi 1 - ASUS' },
-      { id: 202, name: 'Bài thi 2 - ASUS' },
-      { id: 203, name: 'Bài thi 3 - ASUS' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'HP',
-    theories: [
-      { id: 301, name: 'Bài thi 1 - HP' },
-      { id: 302, name: 'Bài thi 2 - HP' },
-      { id: 303, name: 'Bài thi 3 - HP' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Microsoft',
-    children: [
-      { id: 401, name: 'Bài thi 1 - Microsoft' },
-      { id: 402, name: 'Bài thi 2 - Microsoft' },
-      { id: 403, name: 'Bài thi 3 - Microsoft' },
-    ],
-  },
-]
-
-function LessonList() {
+function ProductsList() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
-  const [dataLessonList, setDataLessonList] = useState([])
-  const [lessonPagination, setLessonPagination] = useState({})
-  const [topicCategories, setTopicCategories] = useState([])
-  const [selectedTopicCategory, setSelectedTopicCategory] = useState([])
+  const [dataProduct, setDataProduct] = useState([])
 
   const initialPage = Number(searchParams.get('page')) || 1
   const [pageNumber, setPageNumber] = useState(initialPage)
@@ -108,41 +66,23 @@ function LessonList() {
     window.scrollTo(0, 0)
   }
 
-  const fetchDataTopicCategories = async () => {
-    try {
-      const response = await axiosClient.get(`/theory-category`)
-      if (response.data.status === true) {
-        setTopicCategories(response.data.list)
-      }
-    } catch (error) {
-      console.error('Fetch data topic categories error', error)
-    }
-  }
-
-  useEffect(() => {
-    fetchDataTopicCategories()
-  }, [])
-
-  const fetchDataLessonList = async () => {
+  const fetchDataProduct = async () => {
     try {
       setIsLoading(true)
-      const response = await axiosClient.get(
-        `/theory?page=${pageNumber}&data=${dataSearch}&cat_id=${selectedTopicCategory}`,
-      )
+      const response = await axiosClient.get(`/admin/product?page=${pageNumber}&data=${dataSearch}`)
       if (response.data.status === true) {
-        setDataLessonList(response.data.list)
-        setLessonPagination(response.data.pagination)
+        setDataProduct(response.data.data)
       }
     } catch (error) {
-      console.error('Fetch data lesson list error', error.message)
+      console.error('Fetch data product list error', error.message)
     } finally {
       setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchDataLessonList()
-  }, [pageNumber, debouncedSearchTerm, selectedTopicCategory])
+    fetchDataProduct()
+  }, [pageNumber, debouncedSearchTerm])
 
   // handle toggle filter table
   const handleToggleCollapse = () => {
@@ -150,24 +90,24 @@ function LessonList() {
   }
 
   const handleSearch = (keyword) => {
-    fetchDataLessonList(keyword)
+    fetchDataProduct(keyword)
   }
 
   const handleEditClick = (id) => {
-    navigate(`/lessons/edit?id=${id}`)
+    navigate(`/products/edit?id=${id}`)
   }
 
   // delete row
   const handleDelete = async () => {
     setVisible(true)
     try {
-      const response = await axiosClient.delete(`/theory/${deletedId}`)
+      const response = await axiosClient.delete(`/admin/product/${deletedId}`)
       if (response.data.status === true) {
         setVisible(false)
-        fetchDataLessonList()
+        fetchDataProduct()
       }
     } catch (error) {
-      console.error('Delete lesson id error', error)
+      console.error('Delete product id error', error)
       toast.error('Đã xảy ra lỗi khi xóa. Vui lòng thử lại!')
     }
   }
@@ -195,16 +135,16 @@ function LessonList() {
 
       <CRow className="my-3">
         <CCol>
-          <h3>DANH SÁCH BÀI HỌC</h3>
+          <h2>DANH SÁCH SẢN PHẨM</h2>
         </CCol>
         <CCol md={{ span: 4, offset: 4 }}>
           <div className="d-flex justify-content-end gap-2">
-            <Link to={`/lessons/add`}>
+            <Link to={`/products/add`}>
               <CButton color="primary" type="submit" size="sm">
                 Thêm mới
               </CButton>
             </Link>
-            <Link to={`/lessons/lessonsList`}>
+            <Link to={`/products/productsList`}>
               <CButton color="primary" type="submit" size="sm">
                 Danh sách
               </CButton>
@@ -232,40 +172,13 @@ function LessonList() {
               <tbody>
                 <tr>
                   <td>Tổng cộng</td>
-                  <td className="total-count">{lessonPagination?.total}</td>
+                  <td className="total-count">{dataProduct?.total}</td>
                 </tr>
-                <tr>
-                  <td>Lọc</td>
-                  <td>
-                    <label>Chọn danh mục</label>
-                    <div
-                      className="d-flex"
-                      style={{
-                        columnGap: 10,
-                      }}
-                    >
-                      <CFormSelect
-                        className="component-size w-25"
-                        aria-label="Chọn danh mục"
-                        value={selectedTopicCategory}
-                        onChange={(e) => setSelectedTopicCategory(e.target.value)}
-                        options={[
-                          { label: 'Tất cả', value: '' },
-                          ...(topicCategories && topicCategories.length > 0
-                            ? topicCategories.map((topic) => ({
-                                label: topic.title,
-                                value: topic.cat_id,
-                              }))
-                            : []),
-                        ]}
-                      />
-                    </div>
-                  </td>
-                </tr>
+
                 <tr>
                   <td>Tìm kiếm</td>
                   <td>
-                    <strong>Tìm kiếm từ khóa theo TIÊU ĐỀ BÀI HỌC</strong>
+                    <strong>Tìm kiếm từ khóa theo TIÊU ĐỀ SẢN PHẨM</strong>
                     <input
                       type="text"
                       className="search-input"
@@ -307,7 +220,7 @@ function LessonList() {
                         const isChecked = e.target.checked
                         setIsAllUnDealCheckbox(isChecked)
                         if (isChecked) {
-                          const allIds = dataLessonList?.map((item) => item.id) || []
+                          const allIds = dataProduct?.map((item) => item.id) || []
                           setSelectedUnDealCheckbox(allIds)
                         } else {
                           setSelectedUnDealCheckbox([])
@@ -330,13 +243,6 @@ function LessonList() {
                   >
                     Hình ảnh
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('category.name')}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Danh mục
-                  </CTableHeaderCell>
 
                   <CTableHeaderCell
                     scope="col"
@@ -356,20 +262,20 @@ function LessonList() {
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {dataLessonList &&
-                  dataLessonList?.length > 0 &&
-                  dataLessonList?.map((item, index) => (
-                    <CTableRow key={item.theory_id}>
+                {dataProduct?.data &&
+                  dataProduct?.data?.length > 0 &&
+                  dataProduct?.data?.map((item, index) => (
+                    <CTableRow key={item.product_id}>
                       <CTableHeaderCell scope="row">
                         <CFormCheck
-                          key={item?.theory_id}
+                          key={item?.product_id}
                           aria-label="Default select example"
-                          defaultChecked={item?.theory_id}
-                          id={`flexCheckDefault_${item?.theory_id}`}
-                          value={item?.theory_id}
-                          checked={selectedUnDealCheckbox.includes(item?.theory_id)}
+                          defaultChecked={item?.product_id}
+                          id={`flexCheckDefault_${item?.product_id}`}
+                          value={item?.product_id}
+                          checked={selectedUnDealCheckbox.includes(item?.product_id)}
                           onChange={(e) => {
-                            const undealId = item?.theory_id
+                            const undealId = item?.product_id
                             const isChecked = e.target.checked
                             if (isChecked) {
                               setSelectedUnDealCheckbox([...selectedUnDealCheckbox, undealId])
@@ -382,7 +288,7 @@ function LessonList() {
                         />
                       </CTableHeaderCell>
                       <CTableDataCell>
-                        <Link to={`/exams/edit?id=${item?.theory_id}`}>
+                        <Link to={`/products/edit?id=${item?.product_id}`}>
                           <div className="blue-txt">{item.title}</div>
                         </Link>
                       </CTableDataCell>
@@ -390,18 +296,8 @@ function LessonList() {
                         <CImage
                           src={`${imageBaseUrl}/uploads/${item.picture}`}
                           width={120}
-                          alt={`Ảnh ${item.theory_id}`}
+                          alt={`Ảnh ${item.product_id}`}
                         />
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <div
-                          className="blue-txt"
-                          style={{
-                            fontWeight: 400,
-                          }}
-                        >
-                          {item?.category?.title}
-                        </div>
                       </CTableDataCell>
 
                       <CTableDataCell>
@@ -416,7 +312,7 @@ function LessonList() {
                         <div className="d-flex align-items-center gap-1">
                           <CButton
                             size="sm"
-                            onClick={() => handleEditClick(item.theory_id)}
+                            onClick={() => handleEditClick(item.product_id)}
                             className="button-action mr-2 bg-info"
                           >
                             <CIcon icon={cilColorBorder} className="text-white" />
@@ -425,7 +321,7 @@ function LessonList() {
                             size="sm"
                             onClick={() => {
                               setVisible(true)
-                              setDeletedId(item?.theory_id)
+                              setDeletedId(item?.product_id)
                             }}
                             className="button-action bg-danger"
                           >
@@ -444,7 +340,7 @@ function LessonList() {
       <CRow className="mt-3">
         <div className="d-flex justify-content-end">
           <ReactPaginate
-            pageCount={Math.ceil(lessonPagination.total / lessonPagination.per_page)}
+            pageCount={Math.ceil(dataProduct?.total / dataProduct?.per_page)}
             pageRangeDisplayed={3}
             marginPagesDisplayed={1}
             pageClassName="page-item"
@@ -469,4 +365,4 @@ function LessonList() {
   )
 }
 
-export default LessonList
+export default ProductsList

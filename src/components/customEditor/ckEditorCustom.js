@@ -14,13 +14,14 @@ function CKedtiorCustom({ data, onChangeData, height }) {
       config={{
         versionCheck: false,
         height: height,
-        extraPlugins: ['image2', 'colorbutton'],
-        filebrowserBrowseUrl: 'https://admin.chinhnhan.net/ckfinder/ckfinder.html',
-        filebrowserImageBrowseUrl: 'https://admin.chinhnhan.net/ckfinder/ckfinder.html?type=Images',
+        extraPlugins: ['justify', 'image2', 'colorbutton'],
+        filebrowserBrowseUrl: 'https://media.vitinhnguyenkim.com.vn/ckfinder/ckfinder.html',
+        filebrowserImageBrowseUrl:
+          'https://media.vitinhnguyenkim.com.vn/ckfinder/ckfinder.html?type=Images',
         filebrowserUploadUrl:
-          'https://admin.chinhnhan.net/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files',
+          'https://media.vitinhnguyenkim.com.vn/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files',
         filebrowserImageUploadUrl:
-          'https://admin.chinhnhan.net/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images',
+          'https://media.vitinhnguyenkim.com.vn/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Images',
       }}
       initData={data}
       onChange={(event) => {

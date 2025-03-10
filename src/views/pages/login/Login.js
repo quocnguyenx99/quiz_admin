@@ -18,6 +18,7 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 
 import Logo from '../../../assets/images/logo/question-logo.png'
+import './login.css'
 
 import { axiosClient } from '../../../axiosConfig'
 import { toast } from 'react-toastify'
@@ -61,7 +62,7 @@ const Login = () => {
 
   return (
     <>
-      <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
+      <div className="login-container bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
         <CContainer>
           <CRow className="justify-content-center">
             <CCol md={4}>

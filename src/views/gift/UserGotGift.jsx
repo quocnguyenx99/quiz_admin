@@ -19,12 +19,13 @@ import moment from 'moment'
 import { toast } from 'react-toastify'
 
 import Loading from '../../components/loading/Loading'
-import { axiosClient, imageBaseUrl } from '../../axiosConfig'
+import { axiosClient } from '../../axiosConfig'
 import CIcon from '@coreui/icons-react'
-import { cilCheckCircle, cilColorBorder, cilTrash } from '@coreui/icons'
-import DeletedModal from '../../components/deletedModal/DeletedModal'
+import { cilCheckCircle } from '@coreui/icons'
 import useDebounce from '../../helper/debounce'
 import ConfirmModal from '../../components/deletedModal/ConfirmModal'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 function UserGotGift() {
   const navigate = useNavigate()
@@ -34,6 +35,30 @@ function UserGotGift() {
 
   const initialPage = Number(searchParams.get('page')) || 1
   const [pageNumber, setPageNumber] = useState(initialPage)
+
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [errors, setErrors] = useState({ startDate: '', endDate: '' })
+
+  // validate for date start - date end
+  const validateDates = (start, end) => {
+    const newErrors = { startDate: '', endDate: '' }
+    if (start && end && start > end) {
+      newErrors.startDate = 'Ngày bắt đầu không được sau ngày kết thúc'
+      newErrors.endDate = 'Ngày kết thúc không được trước ngày bắt đầu'
+    }
+    setErrors(newErrors)
+  }
+
+  const handleStartDateChange = (date) => {
+    setStartDate(date)
+    validateDates(date, endDate)
+  }
+
+  const handleEndDateChange = (date) => {
+    setEndDate(date)
+    validateDates(startDate, date)
+  }
 
   //loading
   const [isLoading, setIsLoading] = useState(false)
@@ -68,7 +93,9 @@ function UserGotGift() {
   const fetchDataRewardHistory = async () => {
     try {
       setIsLoading(true)
-      const response = await axiosClient.get(`/gift-history?page=${pageNumber}&data=${dataSearch}`)
+      const response = await axiosClient.get(
+        `/gift-history?page=${pageNumber}&data=${dataSearch}&start_time=${startDate}&end_time=${endDate}`,
+      )
       if (response.data.status === true) {
         setDataReward(response.data.data)
       }
@@ -160,6 +187,30 @@ function UserGotGift() {
                 <tr>
                   <td>Tổng cộng</td>
                   <td className="total-count">{dataReward?.pagination?.total}</td>
+                </tr>
+                <tr>
+                  <td>Theo ngày</td>
+                  <td>
+                    <div className="custom-datepicker-wrapper">
+                      <DatePicker
+                        className="custom-datepicker"
+                        dateFormat={'dd-MM-yyyy'}
+                        showIcon
+                        selected={startDate}
+                        onChange={handleStartDateChange}
+                      />
+                      <p className="datepicker-label">{'đến ngày'}</p>
+                      <DatePicker
+                        className="custom-datepicker"
+                        dateFormat={'dd-MM-yyyy'}
+                        showIcon
+                        selected={endDate}
+                        onChange={handleEndDateChange}
+                      />
+                    </div>
+                    {errors.startDate && <p className="text-danger">{errors.startDate}</p>}
+                    {errors.endDate && <p className="text-danger">{errors.endDate}</p>}
+                  </td>
                 </tr>
                 <tr>
                   <td>Tìm kiếm</td>
@@ -306,9 +357,7 @@ function UserGotGift() {
                         </div>
                       </CTableDataCell>
 
-                      <CTableDataCell>
-                        {moment(item?.confirm_at).format('DD-MM-YYYY, hh:mm:ss A')}
-                      </CTableDataCell>
+                      <CTableDataCell>{item?.confirm_at}</CTableDataCell>
 
                       <CTableDataCell>
                         {item?.status == 'Đã xác nhận' ? (
