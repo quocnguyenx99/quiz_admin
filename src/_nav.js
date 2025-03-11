@@ -161,7 +161,7 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'Danh sách banner',
+        name: 'Danh sách sản phẩm',
         to: '/products/productsList',
       },
     ],

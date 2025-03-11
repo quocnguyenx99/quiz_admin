@@ -403,12 +403,10 @@ function UserResultList() {
                       </CTableDataCell>
 
                       <CTableDataCell>
-                        {moment.unix(item?.time_start).format('DD-MM-YYYY, hh:mm:ss A')}
+                        {moment.unix(item?.time_start).format('DD-MM-YYYY')}
                       </CTableDataCell>
 
-                      <CTableDataCell>
-                        {moment.unix(item?.time_end).format('DD-MM-YYYY, hh:mm:ss A')}
-                      </CTableDataCell>
+                      <CTableDataCell>{item?.time_end}</CTableDataCell>
 
                       {/* <CTableDataCell>
                         <div className="d-flex align-items-center gap-1">

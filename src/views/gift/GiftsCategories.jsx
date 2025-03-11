@@ -56,16 +56,13 @@ function GiftsCategories() {
     title: '',
     description: '',
     rewardPoint: '',
-    visible: false,
+    visible: 0,
   }
 
   const validationSchema = Yup.object({
     title: Yup.string().required('Tiêu đề là bắt buộc.'),
     rewardPoint: Yup.string().required('Cấu hình điểm thưởng nhận quà là bắt buộc.'),
     description: Yup.string().required('Mô tả là bắt buộc.'),
-    visible: Yup.number()
-      .required('Hiển thị là bắt buộc')
-      .oneOf([0, 1], 'Hiển thị phải là 0 hoặc 1'),
   })
 
   // upload image and show image
@@ -360,6 +357,15 @@ function GiftsCategories() {
           </CCol>
           <CCol md={6}>
             <div className="d-flex justify-content-end">
+              <CButton
+                onClick={handleAddNewClick}
+                color="primary"
+                type="submit"
+                size="sm"
+                className="button-add"
+              >
+                Thêm mới
+              </CButton>
               <Link to={'/gifts/category'}>
                 <CButton color="primary" type="submit" size="sm">
                   Danh sách
@@ -469,8 +475,8 @@ function GiftsCategories() {
                         as={CFormSelect}
                         id="visible-select"
                         options={[
-                          { label: 'Không', value: false },
-                          { label: 'Có', value: true },
+                          { label: 'Không', value: 0 },
+                          { label: 'Có', value: 1 },
                         ]}
                       />
                       <ErrorMessage name="visible" component="div" className="text-danger" />
