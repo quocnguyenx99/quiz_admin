@@ -315,41 +315,21 @@ function LessonList() {
                       }}
                     />
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('title')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Tiêu đề
                   </CTableHeaderCell>
 
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('category.name')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Hình ảnh
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('category.name')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Danh mục
                   </CTableHeaderCell>
 
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('updateTime')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Create Time
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('updateTime')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Update Time
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col">Tác vụ</CTableHeaderCell>
@@ -382,7 +362,7 @@ function LessonList() {
                         />
                       </CTableHeaderCell>
                       <CTableDataCell>
-                        <Link to={`/exams/edit?id=${item?.theory_id}`}>
+                        <Link to={`/lessons/edit?id=${item?.theory_id}`}>
                           <div className="blue-txt">{item.title}</div>
                         </Link>
                       </CTableDataCell>
