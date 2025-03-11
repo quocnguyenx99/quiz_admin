@@ -56,7 +56,7 @@ function GiftsCategories() {
     title: '',
     description: '',
     rewardPoint: '',
-    visible: 0,
+    visible: false,
   }
 
   const validationSchema = Yup.object({
@@ -469,8 +469,8 @@ function GiftsCategories() {
                         as={CFormSelect}
                         id="visible-select"
                         options={[
-                          { label: 'Không', value: '0' },
-                          { label: 'Có', value: '1' },
+                          { label: 'Không', value: false },
+                          { label: 'Có', value: true },
                         ]}
                       />
                       <ErrorMessage name="visible" component="div" className="text-danger" />

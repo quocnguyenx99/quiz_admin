@@ -281,47 +281,19 @@ function ExamsList() {
                       }}
                     />
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('title')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Tiêu đề
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('category.name')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Danh mục
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('category.name')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Bài thi
                   </CTableHeaderCell>
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('time')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Cấu hình
                   </CTableHeaderCell>
-
-                  {/* <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('time')}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    Điểm thưởng
-                  </CTableHeaderCell> */}
-                  <CTableHeaderCell
-                    scope="col"
-                    onClick={() => handleSort('updateTime')}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Update Time
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col">Tác vụ</CTableHeaderCell>
