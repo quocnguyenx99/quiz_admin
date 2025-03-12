@@ -88,7 +88,7 @@ function ExamsList() {
     try {
       setIsLoading(true)
       const response = await axiosClient.get(
-        `/admin/quiz?page=${pageNumber}&data=${dataSearch}&categroy=${selectedTopicCategory}`,
+        `/admin/quiz?page=${pageNumber}&data=${dataSearch}&cat_id=${selectedTopicCategory}`,
       )
       if (response.data.status === true) {
         setDataExamsList(response.data.data)
@@ -205,7 +205,7 @@ function ExamsList() {
                       }}
                     >
                       <CFormSelect
-                        className="component-size w-25"
+                        className="component-size w-50"
                         aria-label="Chọn danh mục"
                         value={selectedTopicCategory}
                         onChange={(e) => setSelectedTopicCategory(e.target.value)}
@@ -214,7 +214,7 @@ function ExamsList() {
                           ...(topicCategories && topicCategories.length > 0
                             ? topicCategories.map((topic) => ({
                                 label: topic.title,
-                                value: topic.theory_id,
+                                value: topic.cat_id,
                               }))
                             : []),
                         ]}

@@ -40,6 +40,16 @@ function UserGotGift() {
   const [endDate, setEndDate] = useState('')
   const [errors, setErrors] = useState({ startDate: '', endDate: '' })
 
+  // convert string to timestamp
+  const convertStringToTimeStamp = (dateString) => {
+    if (dateString == '') {
+      return ''
+    } else {
+      const dateMoment = moment(dateString, 'ddd MMM DD YYYY HH:mm:ss GMTZ')
+      return dateMoment.unix()
+    }
+  }
+
   // validate for date start - date end
   const validateDates = (start, end) => {
     const newErrors = { startDate: '', endDate: '' }
@@ -94,7 +104,7 @@ function UserGotGift() {
     try {
       setIsLoading(true)
       const response = await axiosClient.get(
-        `/gift-history?page=${pageNumber}&data=${dataSearch}&start_time=${startDate}&end_time=${endDate}`,
+        `/gift-history?page=${pageNumber}&data=${dataSearch}&start_time=${startDate !== null ? convertStringToTimeStamp(startDate) : ''}&end_time=${endDate !== null ? convertStringToTimeStamp(endDate) : ''}`,
       )
       if (response.data.status === true) {
         setDataReward(response.data.data)

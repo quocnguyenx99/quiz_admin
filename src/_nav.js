@@ -78,11 +78,6 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'Cấu hình chung bài thi',
-        to: '/exams/config',
-      },
-      {
-        component: CNavItem,
         name: 'Danh sách bài thi',
         to: '/exams/examsList',
       },

@@ -60,9 +60,6 @@ function UserResultList() {
   const [dataSearch, setDataSearch] = useState('')
   const debouncedSearchTerm = useDebounce(dataSearch, 1000)
 
-  // sort filter table
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
-
   // convert string to timestamp
   const convertStringToTimeStamp = (dateString) => {
     if (dateString == '') {
@@ -121,7 +118,7 @@ function UserResultList() {
     try {
       setIsLoading(true)
       const response = await axiosClient.get(
-        `/admin/result-exams?page=${pageNumber}&data=${dataSearch}`,
+        `/admin/result-exams?page=${pageNumber}&data=${dataSearch}&cat_id=${selectedTopicCategory}&start=${startDate !== null ? convertStringToTimeStamp(startDate) : ''}&end=${endDate !== null ? convertStringToTimeStamp(endDate) : ''}`,
       )
       if (response.data.status === true) {
         setDataUserResult(response.data.data)
@@ -135,7 +132,7 @@ function UserResultList() {
 
   useEffect(() => {
     fetchDataUserResult()
-  }, [pageNumber, debouncedSearchTerm])
+  }, [pageNumber, debouncedSearchTerm, selectedTopicCategory])
 
   // handle toggle filter table
   const handleToggleCollapse = () => {
@@ -146,45 +143,8 @@ function UserResultList() {
     fetchDataUserResult(keyword)
   }
 
-  const handleEditClick = (id) => {
-    navigate(`/members/edit?id=${id}`)
-  }
-
-  // delete row
-  const handleDelete = async () => {
-    setVisible(true)
-    try {
-      const response = await axiosClient.delete(`/admin/member/${deletedId}`)
-      if (response.data.status === true) {
-        setVisible(false)
-        fetchDataUserResult()
-      }
-    } catch (error) {
-      console.error('Delete member id error', error)
-      toast.error('Đã xảy ra lỗi khi xóa. Vui lòng thử lại!')
-    }
-  }
-
-  const handleDeleteAll = async () => {
-    alert('Đang phát triển ...')
-    // try {
-    //   const response = await axiosClient.post(`admin/delete-all-hot `, {
-    //     data: selectedUnDealCheckbox,
-    //   })
-    //   if (response.data.status === true) {
-    //     toast.success('Xóa các mục đã chọn thành công!')
-    //     fetchDataExamsList()
-    //     setSelectedUnDealCheckbox([])
-    //   }
-    // } catch (error) {
-    //   console.error('Post set delete all is error', error)
-    //   toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
-    // }
-  }
-
   return (
     <CContainer>
-      <DeletedModal visible={visible} setVisible={setVisible} onDelete={handleDelete} />
       <CRow className="my-3">
         <CCol>
           <h3>DANH SÁCH KẾT QUẢ THI</h3>
@@ -248,7 +208,7 @@ function UserResultList() {
                       }}
                     >
                       <CFormSelect
-                        className="component-size w-25"
+                        className="component-size w-50"
                         aria-label="Chọn danh mục"
                         value={selectedTopicCategory}
                         onChange={(e) => setSelectedTopicCategory(e.target.value)}
@@ -257,7 +217,7 @@ function UserResultList() {
                           ...(topicCategories && topicCategories.length > 0
                             ? topicCategories.map((topic) => ({
                                 label: topic.title,
-                                value: topic.theory_id,
+                                value: topic.cat_id,
                               }))
                             : []),
                         ]}
@@ -286,13 +246,13 @@ function UserResultList() {
         </CCol>
       </CRow>
 
-      <CRow>
+      {/* <CRow>
         <CCol className="my-2" md={4}>
           <CButton color="primary" size="sm" onClick={handleDeleteAll}>
             Xóa mục đã chọn
           </CButton>
         </CCol>
-      </CRow>
+      </CRow> */}
 
       {isLoading ? (
         <Loading />
@@ -327,7 +287,7 @@ function UserResultList() {
                   </CTableHeaderCell>
 
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
-                    Số lần thi
+                    Lần thi
                   </CTableHeaderCell>
 
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
@@ -401,34 +361,8 @@ function UserResultList() {
                           )}
                         </div>
                       </CTableDataCell>
-
-                      <CTableDataCell>
-                        {moment.unix(item?.time_start).format('DD-MM-YYYY')}
-                      </CTableDataCell>
-
+                      <CTableDataCell>{item?.time_start}</CTableDataCell>
                       <CTableDataCell>{item?.time_end}</CTableDataCell>
-
-                      {/* <CTableDataCell>
-                        <div className="d-flex align-items-center gap-1">
-                          <CButton
-                            size="sm"
-                            onClick={() => handleEditClick(item.id)}
-                            className="button-action mr-2 bg-info"
-                          >
-                            <CIcon icon={cilColorBorder} className="text-white" />
-                          </CButton>
-                          <CButton
-                            size="sm"
-                            onClick={() => {
-                              setVisible(true)
-                              setDeletedId(item?.id)
-                            }}
-                            className="button-action bg-danger"
-                          >
-                            <CIcon icon={cilTrash} className="text-white" />
-                          </CButton>
-                        </div>
-                      </CTableDataCell> */}
                     </CTableRow>
                   ))}
               </CTableBody>

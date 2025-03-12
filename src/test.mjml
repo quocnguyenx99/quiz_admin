@@ -1,0 +1,56 @@
+<mjml>
+  <mj-head>
+    <mj-preview>Windows 11 Pro giúp khởi nghiệp dễ dàng hơn</mj-preview>
+    <mj-style inline="inline">
+      .title { font-size: 24px; font-weight: bold; color: #fff; }
+      .subtitle { font-size: 18px; color: #fff; }
+      .highlight { font-size: 20px; font-weight: bold; color: #fdd835; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#001f4d">
+    <mj-section background-color="#002d72">
+      <mj-column>
+        <mj-image width="100px" src="https://via.placeholder.com/100" />
+        <mj-text align="center" class="title">Windows 11 Pro giúp việc khởi nghiệp dễ dàng hơn</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#003580">
+      <mj-column>
+        <mj-text class="subtitle">Bảo mật chặt chẽ hơn. Linh hoạt hơn. Năng suất cao hơn.</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#004080">
+      <mj-column>
+        <mj-text align="center" class="highlight">HỌC HĂNG SAY – QUÀ VỀ TAY</mj-text>
+        <mj-image width="200px" src="https://via.placeholder.com/200" />
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-text align="center">THAM GIA NGAY NHẬN QUÀ LIỀN TAY</mj-text>
+        <mj-image width="100px" src="https://via.placeholder.com/100" />
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#00509e">
+      <mj-column>
+        <mj-text class="subtitle">"Bạn không bao giờ ở một chỗ. Máy tính của bạn cũng không nên như vậy."</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-text align="center" class="highlight">Bảo mật nâng cao theo mặc định</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section background-color="#0066cc">
+      <mj-column>
+        <mj-text>Kích hoạt làm việc từ mọi nơi với Windows 11 Pro.</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

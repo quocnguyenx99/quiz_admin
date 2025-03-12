@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const axiosClient = axios.create({
-  baseURL: 'http://192.168.245.190:8085/api',
+  baseURL: 'https://edu.vitinhnguyenkim.com.vn/api',
   headers: {
     'Content-Type': 'application/json',
     Authorization: localStorage.getItem('quizToken')
@@ -24,7 +24,7 @@ axiosClient.interceptors.request.use(
 )
 
 // Configuration for images
-const imageBaseUrl = 'http://192.168.245.190:8085/'
-const mainUrl = 'http://192.168.245.190:8085/'
+const imageBaseUrl = 'https://edu.vitinhnguyenkim.com.vn/'
+const mainUrl = 'https://edu.vitinhnguyenkim.com.vn/'
 
 export { axiosClient, imageBaseUrl, mainUrl }
