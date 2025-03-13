@@ -10,6 +10,7 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CTooltip,
 } from '@coreui/react'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
@@ -21,11 +22,13 @@ import { toast } from 'react-toastify'
 import Loading from '../../components/loading/Loading'
 import { axiosClient } from '../../axiosConfig'
 import CIcon from '@coreui/icons-react'
-import { cilCheckCircle } from '@coreui/icons'
+import { cilCheckCircle, cilColorBorder, cilTrash } from '@coreui/icons'
 import useDebounce from '../../helper/debounce'
 import ConfirmModal from '../../components/deletedModal/ConfirmModal'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+
+import '../gift/styles/userGotGift.scss'
 
 function UserGotGift() {
   const navigate = useNavigate()
@@ -129,9 +132,9 @@ function UserGotGift() {
     fetchDataRewardHistory(keyword)
   }
 
-  // const handleEditClick = (id) => {
-  //   navigate(`/members/edit?id=${id}`)
-  // }
+  const handleEditClick = (id) => {
+    navigate(`/gifts/reward-detail?id=${id}`)
+  }
 
   // delete row
   const handleConfirm = async () => {
@@ -256,8 +259,8 @@ function UserGotGift() {
       ) : (
         <CRow className="mt-2">
           <CCol>
-            <CTable className="border" hover>
-              <CTableHead style={{ fontSize: 13 }} color="primary">
+            <CTable style={{ fontSize: 13 }} className="border" hover>
+              <CTableHead color="primary">
                 <CTableRow>
                   <CTableHeaderCell scope="col">
                     <CFormCheck
@@ -279,7 +282,7 @@ function UserGotGift() {
                     Username
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
-                    Thông tin member
+                    Thông tin user
                   </CTableHeaderCell>
 
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
@@ -287,15 +290,15 @@ function UserGotGift() {
                   </CTableHeaderCell>
 
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
-                    Điểm quy đổi
+                    Điểm đổi
                   </CTableHeaderCell>
 
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
-                    Thời gian đổi quà
+                    T/g đổi quà
                   </CTableHeaderCell>
 
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
-                    Trạng thái nhận quà
+                    Trạng thái quà tặng
                   </CTableHeaderCell>
 
                   <CTableHeaderCell scope="col">Tác vụ</CTableHeaderCell>
@@ -353,8 +356,10 @@ function UserGotGift() {
                         </div>
                       </CTableDataCell>
 
-                      <CTableDataCell>
-                        <div className="orange-txt">{item?.gift?.title}</div>
+                      <CTableDataCell className="gift-title-cell">
+                        <CTooltip content={item?.gift?.title}>
+                          <div className="orange-txt">{item?.gift?.title}</div>
+                        </CTooltip>
                       </CTableDataCell>
 
                       <CTableDataCell>
@@ -392,16 +397,12 @@ function UserGotGift() {
                       </CTableDataCell>
 
                       <CTableDataCell>
-                        <div className="d-flex align-items-center gap-1">
+                        <div className="d-flex align-items-center">
                           <CButton
-                            size="sm"
-                            onClick={() => {
-                              setVisible(true)
-                              setConfirmId(item?.id)
-                            }}
-                            className="button-action bg-info"
+                            onClick={() => handleEditClick(item.id)}
+                            className="button-action mr-2 bg-info"
                           >
-                            <CIcon size="lg" icon={cilCheckCircle} className="text-white" />
+                            <CIcon icon={cilColorBorder} className="text-white" />
                           </CButton>
                         </div>
                       </CTableDataCell>

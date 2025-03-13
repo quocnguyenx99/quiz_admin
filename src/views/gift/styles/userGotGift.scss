@@ -1,0 +1,6 @@
+.gift-title-cell {
+  max-width: 150px; /* Giới hạn độ rộng */
+  white-space: nowrap; /* Không cho xuống dòng */
+  overflow: hidden; /* Ẩn phần nội dung thừa */
+  text-overflow: ellipsis; /* Hiển thị dấu ba chấm (...) */
+}

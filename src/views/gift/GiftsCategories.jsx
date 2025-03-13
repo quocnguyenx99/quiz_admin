@@ -56,6 +56,7 @@ function GiftsCategories() {
     title: '',
     description: '',
     rewardPoint: '',
+    quantity: 0,
     visible: 0,
   }
 
@@ -63,6 +64,10 @@ function GiftsCategories() {
     title: Yup.string().required('Tiêu đề là bắt buộc.'),
     rewardPoint: Yup.string().required('Cấu hình điểm thưởng nhận quà là bắt buộc.'),
     description: Yup.string().required('Mô tả là bắt buộc.'),
+    quantity: Yup.number().required('Số lượng quà tặng là bắt buộc.'),
+    visible: Yup.number()
+      .required('Hiển thị là bắt buộc')
+      .oneOf([0, 1], 'Hiển thị phải là 0 hoặc 1'),
   })
 
   // upload image and show image
@@ -114,7 +119,7 @@ function GiftsCategories() {
         setDataGift(response.data.data)
       }
     } catch (error) {
-      console.error('Fetch data lesson categories error', error)
+      console.error('Fetch data gift categories error', error)
     }
   }
 
@@ -131,6 +136,7 @@ function GiftsCategories() {
           title: data?.title,
           description: data?.description,
           rewardPoint: data?.reward_point,
+          quantity: data?.quantity,
           visible: data?.display,
         })
         setSelectedFile(data?.picture)
@@ -152,6 +158,7 @@ function GiftsCategories() {
           description: values.description,
           reward_point: values.rewardPoint,
           picture: selectedFile,
+          quantity: values.quantity,
           display: values.visible,
         })
         if (response.data.status === true) {
@@ -164,7 +171,7 @@ function GiftsCategories() {
           console.error('No data found for the given ID.')
         }
       } catch (error) {
-        console.error('Put data id lesson category error', error.message)
+        console.error('Put data id gift category error', error.message)
         toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
       } finally {
         setIsLoading(false)
@@ -178,6 +185,7 @@ function GiftsCategories() {
           description: values.description,
           reward_point: values.rewardPoint,
           picture: selectedFile,
+          quantity: values.quantity,
           display: values.visible,
         })
 
@@ -188,7 +196,7 @@ function GiftsCategories() {
           fetchDataGifts()
         }
       } catch (error) {
-        console.error('Post data lesson category is error', error)
+        console.error('Post data gift category is error', error)
         toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
       } finally {
         setIsLoading(false)
@@ -254,8 +262,8 @@ function GiftsCategories() {
   }
 
   const items =
-    dataGift && dataGift?.length > 0
-      ? dataGift.map((item) => ({
+    dataGift?.data && dataGift?.data?.length > 0
+      ? dataGift?.data.map((item) => ({
           id: (
             <CFormCheck
               key={item?.id}
@@ -280,6 +288,7 @@ function GiftsCategories() {
             <CImage src={`${imageBaseUrl}/uploads/${item.picture}`} width={100} alt={item.id} />
           ),
           rewardPoints: item.reward_point,
+          quantity: item.quantity,
           actions: (
             <div className="d-flex align-items-center">
               <CButton
@@ -338,6 +347,12 @@ function GiftsCategories() {
     {
       key: 'rewardPoints',
       label: 'Điểm thưởng',
+      _props: { scope: 'col' },
+    },
+
+    {
+      key: 'quantity',
+      label: 'Số lượng',
       _props: { scope: 'col' },
     },
     {
@@ -432,6 +447,14 @@ function GiftsCategories() {
                       <ErrorMessage name="rewardPoint" component="div" className="text-danger" />
                     </CCol>
                     <br />
+
+                    <CCol md={12}>
+                      <label htmlFor="quantity-input">Số lượng</label>
+                      <Field name="quantity" type="number" as={CFormInput} id="quantity-input" />
+                      <ErrorMessage name="quantity" component="div" className="text-danger" />
+                    </CCol>
+                    <br />
+
                     <CCol md={12}>
                       <CFormInput
                         name="avatar"
@@ -503,7 +526,7 @@ function GiftsCategories() {
           </CCol>
 
           <CCol>
-            <Search count={dataGift?.length} onSearchData={handleSearch} />
+            <Search count={dataGift?.total} onSearchData={handleSearch} />
             <CCol md={12} className="mt-3">
               <CButton onClick={handleDeleteAll} color="primary" size="sm">
                 Xóa mục đã chọn
@@ -513,7 +536,7 @@ function GiftsCategories() {
 
             <div className="d-flex justify-content-end">
               <ReactPaginate
-                pageCount={Math.ceil(dataGift?.length / 10)}
+                pageCount={Math.ceil(dataGift?.total / dataGift?.per_page)}
                 pageRangeDisplayed={3}
                 marginPagesDisplayed={1}
                 pageClassName="page-item"
