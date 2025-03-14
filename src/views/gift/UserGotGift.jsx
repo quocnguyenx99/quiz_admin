@@ -210,14 +210,6 @@ function UserGotGift() {
         </CCol>
       </CRow>
 
-      {/* <CRow>
-        <CCol className="my-2" md={4}>
-          <CButton color="primary" size="sm" onClick={handleDeleteAll}>
-            Xóa mục đã chọn
-          </CButton>
-        </CCol>
-      </CRow> */}
-
       {isLoading ? (
         <Loading />
       ) : (

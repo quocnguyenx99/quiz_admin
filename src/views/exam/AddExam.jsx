@@ -258,6 +258,10 @@ function AddExam() {
         toast.success('Bài thi đã được thêm mới!')
       }
     } catch (error) {
+      if (error.response.data.message === 'Quiz already exists') {
+        toast.error('Bài học được chọn đã tồn tại bài thi!')
+        return
+      }
       console.error('Post data exam is error', error)
       toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
     } finally {

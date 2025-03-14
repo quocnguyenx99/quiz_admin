@@ -96,9 +96,6 @@ function LessonList() {
   const [dataSearch, setDataSearch] = useState('')
   const debouncedSearchTerm = useDebounce(dataSearch, 1000)
 
-  // sort filter table
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
-
   // pagination
   const handlePageChange = ({ selected }) => {
     const newPage = selected + 1
@@ -245,7 +242,7 @@ function LessonList() {
                       }}
                     >
                       <CFormSelect
-                        className="component-size w-25"
+                        className="component-size w-50"
                         aria-label="Chọn danh mục"
                         value={selectedTopicCategory}
                         onChange={(e) => setSelectedTopicCategory(e.target.value)}

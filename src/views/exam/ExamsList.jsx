@@ -288,7 +288,7 @@ function ExamsList() {
                     Danh mục
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
-                    Bài thi
+                    Bài học
                   </CTableHeaderCell>
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Cấu hình

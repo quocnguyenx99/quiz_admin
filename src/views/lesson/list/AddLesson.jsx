@@ -18,50 +18,11 @@ import CKedtiorCustom from '../../../components/customEditor/ckEditorCustom'
 import { axiosClient, imageBaseUrl } from '../../../axiosConfig'
 import { toast } from 'react-toastify'
 
-const topicCategoriesData = [
-  {
-    id: 1,
-    name: 'DELL',
-    theories: [
-      { id: 101, name: 'Bài thi 1 - DELL' },
-      { id: 102, name: 'Bài thi 2 - DELL' },
-      { id: 103, name: 'Bài thi 3 - DELL' },
-    ],
-  },
-  {
-    id: 2,
-    name: 'ASUS',
-    theories: [
-      { id: 201, name: 'Bài thi 1 - ASUS' },
-      { id: 202, name: 'Bài thi 2 - ASUS' },
-      { id: 203, name: 'Bài thi 3 - ASUS' },
-    ],
-  },
-  {
-    id: 3,
-    name: 'HP',
-    theories: [
-      { id: 301, name: 'Bài thi 1 - HP' },
-      { id: 302, name: 'Bài thi 2 - HP' },
-      { id: 303, name: 'Bài thi 3 - HP' },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Microsoft',
-    children: [
-      { id: 401, name: 'Bài thi 1 - Microsoft' },
-      { id: 402, name: 'Bài thi 2 - Microsoft' },
-      { id: 403, name: 'Bài thi 3 - Microsoft' },
-    ],
-  },
-]
-
 function AddLesson() {
   // ckeditor state
   const [editorData, setEditorData] = useState('')
 
-  const [dataTopicCategories, setDataTopicCategories] = useState(topicCategoriesData)
+  const [dataTopicCategories, setDataTopicCategories] = useState([])
   // const [selectedCateCheckbox, setSelectedCateCheckbox] = useState([])
 
   // loading button
@@ -317,12 +278,12 @@ function AddLesson() {
                           text="Lựa chọn danh mục sẽ hiển thị bài học ngoài trang chủ."
                           options={[
                             { label: 'Chọn danh mục', value: '', disabled: true },
-                            ...(Array.isArray(dataTopicCategories) &&
-                              dataTopicCategories.length > 0 &&
-                              dataTopicCategories.map((cate) => ({
-                                label: cate.title,
-                                value: cate.cat_id,
-                              }))),
+                            ...(Array.isArray(dataTopicCategories) && dataTopicCategories.length > 0
+                              ? dataTopicCategories.map((cate) => ({
+                                  label: cate.title,
+                                  value: cate.cat_id,
+                                }))
+                              : []),
                           ]}
                         />
                         <ErrorMessage
