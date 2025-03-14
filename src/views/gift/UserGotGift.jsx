@@ -136,44 +136,8 @@ function UserGotGift() {
     navigate(`/gifts/reward-detail?id=${id}`)
   }
 
-  // delete row
-  const handleConfirm = async () => {
-    setVisible(true)
-    try {
-      const response = await axiosClient.post(`/gifts/${confirmId}/confirm`, {
-        _method: 'PATCH',
-      })
-      if (response.data.status === true) {
-        setVisible(false)
-        fetchDataRewardHistory()
-      }
-    } catch (error) {
-      console.error('Confirm gift info id error', error)
-      toast.error('Đã xảy ra lỗi khi xóa. Vui lòng thử lại!')
-    }
-  }
-
-  const handleDeleteAll = async () => {
-    alert('Đang phát triển ...')
-    // try {
-    //   const response = await axiosClient.post(`admin/delete-all-hot `, {
-    //     data: selectedUnDealCheckbox,
-    //   })
-    //   if (response.data.status === true) {
-    //     toast.success('Xóa các mục đã chọn thành công!')
-    //     fetchDataExamsList()
-    //     setSelectedUnDealCheckbox([])
-    //   }
-    // } catch (error) {
-    //   console.error('Post set delete all is error', error)
-    //   toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
-    // }
-  }
-
   return (
     <CContainer>
-      <ConfirmModal visible={visible} setVisible={setVisible} onDelete={handleConfirm} />
-
       <CRow className="my-3">
         <CCol>
           <h3>LỊCH SỬ ĐỔI QUÀ</h3>
@@ -246,13 +210,13 @@ function UserGotGift() {
         </CCol>
       </CRow>
 
-      <CRow>
+      {/* <CRow>
         <CCol className="my-2" md={4}>
           <CButton color="primary" size="sm" onClick={handleDeleteAll}>
             Xóa mục đã chọn
           </CButton>
         </CCol>
-      </CRow>
+      </CRow> */}
 
       {isLoading ? (
         <Loading />

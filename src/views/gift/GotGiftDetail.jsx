@@ -17,9 +17,11 @@ import {
   CTableDataCell,
   CFormSelect,
   CImage,
+  CButton,
 } from '@coreui/react'
 import { axiosClient, imageBaseUrl } from '../../axiosConfig'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const GiftHistory = () => {
   const location = useLocation()
@@ -29,11 +31,14 @@ const GiftHistory = () => {
 
   const [dataRewardDetail, setDataRewardDetail] = useState([])
 
+  const [giftStatus, setGiftStatus] = useState()
+
   const fetchDataReward = async () => {
     try {
       const response = await axiosClient.get(`/detail-gift-history/${id}`)
       if (response.data && response.data.status === true) {
         setDataRewardDetail(response.data.data)
+        setGiftStatus(response.data.data?.is_confirmed)
       }
     } catch (error) {
       console.error('Fetch data reward detail error', error.message)
@@ -44,10 +49,19 @@ const GiftHistory = () => {
     fetchDataReward()
   }, [])
 
-  const handleStatusChange = (id, newStatus) => {
-    setGiftStatus((prevStatus) =>
-      prevStatus.map((gift) => (gift.id === id ? { ...gift, status: newStatus } : gift)),
-    )
+  const handleConfirm = async (confirmId) => {
+    try {
+      const response = await axiosClient.post(`/gifts/${confirmId}/confirm`, {
+        _method: 'PATCH',
+      })
+      if (response.data.status === true) {
+        fetchDataReward()
+        toast.success('Đã cập nhật trạng thái quà tặng')
+      }
+    } catch (error) {
+      console.error('Confirm gift info id error', error)
+      toast.error('Đã xảy ra lỗi khi xóa. Vui lòng thử lại!')
+    }
   }
 
   return (
@@ -55,6 +69,16 @@ const GiftHistory = () => {
       <CRow className="my-3">
         <CCol>
           <h3>CHI TIẾT NHẬN QUÀ</h3>
+        </CCol>
+
+        <CCol md={6}>
+          <div className="d-flex justify-content-end">
+            <Link to={'/gifts/reward-history'}>
+              <CButton color="primary" type="submit" size="sm">
+                Danh sách
+              </CButton>
+            </Link>
+          </div>
         </CCol>
       </CRow>
       <CRow>
@@ -127,6 +151,7 @@ const GiftHistory = () => {
                     <CTableHeaderCell>Số lượng</CTableHeaderCell>
                     <CTableHeaderCell>Thời gian đổi quà</CTableHeaderCell>
                     <CTableHeaderCell>Trạng thái</CTableHeaderCell>
+                    <CTableHeaderCell>Tác vụ</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
@@ -143,15 +168,23 @@ const GiftHistory = () => {
                     <CTableDataCell>{dataRewardDetail?.confirm_at}</CTableDataCell>
                     <CTableDataCell>
                       <CFormSelect
-                        value={dataRewardDetail?.is_confirmed}
-                        onChange={(e) =>
-                          handleStatusChange(dataRewardDetail.gift.id, e.target.value)
-                        }
+                        value={giftStatus}
+                        onChange={(e) => setGiftStatus(e.target.value)}
                         options={[
                           { label: 'Đang chờ xử lý', value: 'Chờ xác nhận' },
                           { label: 'Đã gửi quà', value: 'Đã xác nhận' },
                         ]}
                       ></CFormSelect>
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CButton
+                        size="sm"
+                        color="primary"
+                        type="button"
+                        onClick={() => handleConfirm(dataRewardDetail?.id)}
+                      >
+                        Cập nhật
+                      </CButton>
                     </CTableDataCell>
                   </CTableRow>
                 </CTableBody>
