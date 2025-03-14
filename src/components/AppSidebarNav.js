@@ -10,21 +10,21 @@ import { axiosClient } from '../axiosConfig'
 
 export const AppSidebarNav = ({ items }) => {
   const [dataNotSeen, setDataNotSeen] = useState({})
-  // useEffect(() => {
-  //   const fetchNotSeenData = async () => {
-  //     try {
-  //       const response = await axiosClient.get('/admin/no-approved-statistics')
+  useEffect(() => {
+    const fetchNotSeenData = async () => {
+      try {
+        const response = await axiosClient.get('/admin/count-member-gift')
 
-  //       if (response.data.status === true) {
-  //         setDataNotSeen(response.data)
-  //       }
-  //     } catch (error) {
-  //       console.error('Fetch data not seen is error', error)
-  //     }
-  //   }
+        if (response.data.status === true) {
+          setDataNotSeen(response.data)
+        }
+      } catch (error) {
+        console.error('Fetch data not seen is error', error)
+      }
+    }
 
-  //   fetchNotSeenData()
-  // }, [])
+    fetchNotSeenData()
+  }, [])
 
   const navLink = (name, icon, badge, indent = false) => {
     return (
@@ -42,29 +42,14 @@ export const AppSidebarNav = ({ items }) => {
             {badge.text}
           </CBadge>
         )}
-        {name == 'QUẢN LÝ ĐƠN HÀNG' && (
+        {name == 'Danh sách thành viên' && (
           <CBadge color={'danger'} className="ms-auto" size="sm">
-            {dataNotSeen?.countOrderSum}
+            {dataNotSeen?.countMember}
           </CBadge>
         )}
-        {name == 'QUẢN LÝ TUYỂN DỤNG' && (
+        {name == 'Danh sách đổi quà' && (
           <CBadge color={'danger'} className="ms-auto" size="sm">
-            {dataNotSeen?.countCandidates}
-          </CBadge>
-        )}
-        {name == 'QUẢN LÝ COMMENT' && (
-          <CBadge color={'danger'} className="ms-auto" size="sm">
-            {dataNotSeen?.countComment}
-          </CBadge>
-        )}
-        {name == 'QUẢN LÝ LIÊN HỆ' && (
-          <CBadge color={'danger'} className="ms-auto" size="sm">
-            {dataNotSeen?.countContactQoute}
-          </CBadge>
-        )}
-        {name == 'QUẢN LÝ NEWSLETTER' && (
-          <CBadge color={'danger'} className="ms-auto" size="sm">
-            {dataNotSeen?.countMailList}
+            {dataNotSeen?.countGiftHistory}
           </CBadge>
         )}
       </>

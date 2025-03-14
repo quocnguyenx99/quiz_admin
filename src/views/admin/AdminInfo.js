@@ -137,15 +137,6 @@ function AdminInfo() {
           <h2>THÔNG TIN ADMIN</h2>
           <h6>Thông tin tài khoản</h6>
         </CCol>
-        <CCol md={6}>
-          <div className="d-flex justify-content-end">
-            <Link to={'/admin/list'}>
-              <CButton color="primary" size="sm">
-                Thêm mới
-              </CButton>
-            </Link>
-          </div>
-        </CCol>
       </CRow>
       <CRow>
         <CCol md={6}>
@@ -250,7 +241,7 @@ function AdminInfo() {
             </CCol>
             <br /> */}
 
-            <CCol xs={12}>
+            {/* <CCol xs={12}>
               <CButton
                 onClick={handleSubmit}
                 color="primary"
@@ -266,7 +257,7 @@ function AdminInfo() {
                   'Cập nhật'
                 )}
               </CButton>
-            </CCol>
+            </CCol> */}
           </CForm>
         </CCol>
       </CRow>

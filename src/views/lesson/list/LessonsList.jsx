@@ -170,20 +170,20 @@ function LessonList() {
   }
 
   const handleDeleteAll = async () => {
-    alert('Đang phát triển ...')
-    // try {
-    //   const response = await axiosClient.post(`admin/delete-all-hot `, {
-    //     data: selectedUnDealCheckbox,
-    //   })
-    //   if (response.data.status === true) {
-    //     toast.success('Xóa các mục đã chọn thành công!')
-    //     fetchDataExamsList()
-    //     setSelectedUnDealCheckbox([])
-    //   }
-    // } catch (error) {
-    //   console.error('Post set delete all is error', error)
-    //   toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
-    // }
+    try {
+      const response = await axiosClient.post(`/theorys/delete `, {
+        _method: 'DELETE',
+        ids: selectedUnDealCheckbox,
+      })
+      if (response.data.status === true) {
+        toast.success('Xóa các mục đã chọn thành công!')
+        fetchDataLessonList()
+        setSelectedUnDealCheckbox([])
+      }
+    } catch (error) {
+      console.error('Post set delete all is error', error)
+      toast.error('Đã xảy ra lỗi. Vui lòng thử lại!')
+    }
   }
 
   return (

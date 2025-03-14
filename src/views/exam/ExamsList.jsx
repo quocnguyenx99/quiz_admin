@@ -133,10 +133,11 @@ function ExamsList() {
   }
 
   const handleDeleteAll = async () => {
-    alert('Đang phát triển ...')
+    alert('Đang phát triển...')
     // try {
-    //   const response = await axiosClient.post(`admin/delete-all-hot `, {
-    //     data: selectedUnDealCheckbox,
+    //   const response = await axiosClient.post(`/theorys/delete `, {
+    //     _method: 'DELETE',
+    //     ids: selectedUnDealCheckbox,
     //   })
     //   if (response.data.status === true) {
     //     toast.success('Xóa các mục đã chọn thành công!')

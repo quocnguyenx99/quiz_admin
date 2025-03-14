@@ -137,7 +137,7 @@ function ProductsList() {
         <CCol>
           <h2>DANH SÁCH SẢN PHẨM</h2>
         </CCol>
-        <CCol md={{ span: 4, offset: 4 }}>
+        <CCol>
           <div className="d-flex justify-content-end gap-2">
             <Link to={`/products/add`}>
               <CButton color="primary" type="submit" size="sm">
