@@ -164,7 +164,7 @@ const GiftHistory = () => {
                       />
                     </CTableDataCell>
                     <CTableDataCell>{dataRewardDetail?.gift?.title}</CTableDataCell>
-                    <CTableDataCell>{dataRewardDetail.gift?.quantity}</CTableDataCell>
+                    <CTableDataCell>{1}</CTableDataCell>
                     <CTableDataCell>{dataRewardDetail?.confirm_at}</CTableDataCell>
                     <CTableDataCell>
                       <CFormSelect
