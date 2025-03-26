@@ -23,10 +23,14 @@ import { CKEditor } from 'ckeditor4-react'
 import './style/addExam.scss'
 import CIcon from '@coreui/icons-react'
 import { cilLibraryAdd } from '@coreui/icons'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 function AddExam() {
   const [dataTopicCategories, setDataTopicCategories] = useState([])
 
+  const [expirationDate, setExpirationDate] = useState('')
+  const [showDate, setShowDate] = useState('')
   const [questions, setQuestions] = useState([
     {
       question_text: '',
@@ -247,6 +251,7 @@ function AddExam() {
         title: values.title,
         friendlyUrl: values.friendlyUrl,
         questions: questions,
+        expirationDate: expirationDate,
         duration: values.duration,
         pointAward: values.pointAward,
         picture: selectedFile,
@@ -298,6 +303,12 @@ function AddExam() {
 
     // Set file URLs for immediate preview
     setFile(fileUrls)
+  }
+  const handleExpirationDateChange = (date) => {
+    const timestamp = date.getTime()
+    const unixTimestamp = Math.floor(timestamp / 1000)
+    setExpirationDate(unixTimestamp)
+    setShowDate(date)
   }
 
   return (
@@ -630,6 +641,17 @@ function AddExam() {
                           <ErrorMessage name="exam" component="div" className="text-danger" />
                         </CCol>
                       )}
+                      <br />
+                      <CCol md={12}>
+                        <label htmlFor="expirationDate">Ngày hết hạn</label>
+                        <DatePicker
+                          className="custom-datepicker"
+                          dateFormat={'dd-MM-yyyy'}
+                          showIcon
+                          selected={showDate}
+                          onChange={handleExpirationDateChange}
+                        />
+                      </CCol>
                       <br />
                       <CCol md={12}>
                         <label htmlFor="duration-input">Thời gian làm bài</label>

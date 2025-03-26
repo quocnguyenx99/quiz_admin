@@ -3,6 +3,7 @@ import CIcon from '@coreui/icons-react'
 import {
   cilBook,
   cilClipboard,
+  cilClone,
   cilCog,
   cilDescription,
   cilFile,
@@ -177,6 +178,19 @@ const _nav = [
         component: CNavItem,
         name: 'Quản lý email',
         to: '/system/email',
+      },
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'THỐNG KÊ TRUY CẬP',
+    to: '/log',
+    icon: <CIcon icon={cilClone} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Danh sách truy cập',
+        to: '/log/user-log',
       },
     ],
   },
