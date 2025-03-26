@@ -25,9 +25,13 @@ import CIcon from '@coreui/icons-react'
 import { cilLibraryAdd } from '@coreui/icons'
 import { duration } from 'moment'
 
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 function EditExam() {
   const [dataTopicCategories, setDataTopicCategories] = useState([])
 
+  const [expirationDate, setExpirationDate] = useState('')
+  const [showDate, setShowDate] = useState('')
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
   const id = searchParams.get('id')
@@ -121,6 +125,7 @@ function EditExam() {
           visible: data?.display,
         })
         setQuestions(transformData(questions))
+        setShowDate(data.expirationDate !== null ? new Date(data.expirationDate * 1000) : '')
       } else {
         console.error('No data found for the given ID.')
       }
@@ -283,6 +288,7 @@ function EditExam() {
         title: values.title,
         friendlyUrl: values.friendlyUrl,
         questions: questions,
+        expirationDate: expirationDate,
         duration: values.duration,
         pointAward: values.pointAward,
         cat_id: values.topicCategory,
@@ -331,6 +337,12 @@ function EditExam() {
     setFile(fileUrls)
   }
 
+  const handleExpirationDateChange = (date) => {
+    const timestamp = date.getTime()
+    const unixTimestamp = Math.floor(timestamp / 1000)
+    setExpirationDate(unixTimestamp)
+    setShowDate(date)
+  }
   return (
     <CContainer>
       <CRow className="mb-3">
@@ -666,6 +678,17 @@ function EditExam() {
                       )}
                       <br />
 
+                      <CCol md={12}>
+                        <label htmlFor="expirationDate">Ngày hết hạn</label>
+                        <DatePicker
+                          className="custom-datepicker"
+                          dateFormat={'dd-MM-yyyy'}
+                          showIcon
+                          selected={showDate}
+                          onChange={handleExpirationDateChange}
+                        />
+                      </CCol>
+                      <br />
                       <CCol md={12}>
                         <label htmlFor="duration-input">Thời gian làm bài</label>
                         <Field

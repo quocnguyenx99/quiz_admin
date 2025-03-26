@@ -297,6 +297,9 @@ function ExamsList() {
                   <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
                     Update Time
                   </CTableHeaderCell>
+                  <CTableHeaderCell scope="col" style={{ cursor: 'pointer' }}>
+                    Ngày hết hạn
+                  </CTableHeaderCell>
                   <CTableHeaderCell scope="col">Tác vụ</CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
@@ -376,6 +379,9 @@ function ExamsList() {
                         {moment(item?.updated_at).format('DD-MM-YYYY, hh:mm:ss A')}
                       </CTableDataCell>
 
+                      <CTableDataCell>
+                        {item?.expirationDate !== null ? item?.expirationDate : 'Không có'}
+                      </CTableDataCell>
                       <CTableDataCell>
                         <div className="d-flex align-items-center gap-1">
                           <CButton

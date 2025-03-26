@@ -49,6 +49,9 @@ const ProductsList = React.lazy(() => import('./views/products/ProductsList'))
 const AddProduct = React.lazy(() => import('./views/products/AddProduct'))
 const EditProduct = React.lazy(() => import('./views/products/EditProduct'))
 
+//TAB THỐNG KÊ TRUY CẬP
+const UserLog = React.lazy(() => import('./views/userLog/UserLog.jsx'))
+
 const routes = [
   { path: '/', exact: true, name: 'Home' },
 
@@ -127,6 +130,8 @@ const routes = [
   { path: '/products/add', name: 'AddProduct', element: AddProduct, exact: true },
   { path: '/products/edit', name: 'EditProduct', element: EditProduct, exact: true },
   { path: '/products/productsList', name: 'ProductsList', element: ProductsList, exact: true },
+
+  { path: '/log/user-log', name: 'UserLog', element: UserLog, exact: true },
 ]
 
 export default routes

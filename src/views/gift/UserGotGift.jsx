@@ -4,6 +4,7 @@ import {
   CContainer,
   CFormCheck,
   CRow,
+  CSpinner,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -17,7 +18,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 
 import ReactPaginate from 'react-paginate'
 import moment from 'moment'
-import { toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 
 import Loading from '../../components/loading/Loading'
 import { axiosClient } from '../../axiosConfig'
@@ -75,7 +76,7 @@ function UserGotGift() {
 
   //loading
   const [isLoading, setIsLoading] = useState(false)
-
+  const [isButtonLoading, setIsButtonLoading] = useState(false)
   //checkbox for selected delete items
   const [isAllUnDealCheckbox, setIsAllUnDealCheckbox] = useState(false)
   const [selectedUnDealCheckbox, setSelectedUnDealCheckbox] = useState([])
@@ -132,15 +133,62 @@ function UserGotGift() {
     fetchDataRewardHistory(keyword)
   }
 
+  const downloadFile = async () => {
+    try {
+      setIsButtonLoading(true)
+      const response = await fetch('http://192.168.245.190:8085/api/admin/gift-history/export', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('quizToken')}`,
+        },
+      })
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'Danh sách nhận quà.xlsx'
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      toast.success('Tải file thành công')
+    } catch (error) {
+      console.error('Tải file thất bại:', error)
+      toast.warning('Tải file thất bại!')
+    } finally {
+      setIsButtonLoading(false)
+    }
+  }
+
   const handleEditClick = (id) => {
     navigate(`/gifts/reward-detail?id=${id}`)
   }
 
   return (
     <CContainer>
+      <ToastContainer />
       <CRow className="my-3">
-        <CCol>
+        <CCol md={6}>
           <h3>LỊCH SỬ ĐỔI QUÀ</h3>
+        </CCol>
+        <CCol md={6}>
+          <div className="d-flex justify-content-end">
+            <CButton
+              color="primary"
+              type="submit"
+              size="sm"
+              className="button-add"
+              onClick={downloadFile}
+            >
+              {isButtonLoading ? (
+                <>
+                  <CSpinner size="sm"></CSpinner> Đang xuất excel...
+                </>
+              ) : (
+                'Xuất Excel'
+              )}
+            </CButton>
+          </div>
         </CCol>
       </CRow>
 
