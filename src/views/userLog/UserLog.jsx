@@ -49,11 +49,6 @@ function userLog() {
       setIsLoading(true)
       const startTimestamp = startDate ? convertStringToTimeStamp(startDate) : ''
       let endTimestamp = endDate ? convertStringToTimeStamp(endDate) : ''
-
-      if (startTimestamp && !endTimestamp) {
-        endTimestamp = startTimestamp
-      }
-
       const url = `http://192.168.245.190:8085/api/admin/member_log?page=${pageNumber}&data=${dataSearch}&start_time=${startTimestamp}&end_time=${endTimestamp}`
 
       const res = await axios(url, {
@@ -85,12 +80,25 @@ function userLog() {
   const items =
     memberLog && memberLog.length > 0
       ? memberLog?.map((log) => ({
-          user: <div className="fw-bold">{log.member.username}</div>,
-          link: <div style={{ minWidth: '100px' }}>{log.friendly_url}</div>,
-          module: <div>{log.module}</div>,
-          action: <div>{log.action}</div>,
-          date: <div>{moment(log.created_at).format('DD-MM-YYYY, hh:mm:ss A')}</div>,
-          ip: <div>{log.ip_address}</div>,
+          user: (
+            <div className="fw-bold" style={{ color: '#3C8DBC', textAlign: 'center' }}>
+              {log.member.username}
+            </div>
+          ),
+          link: (
+            <div style={{ minWidth: '100px', textAlign: 'center' }}>
+              <a href={log.friendly_url}>{log.friendly_url}</a>
+            </div>
+          ),
+          module: (
+            <div style={{ textAlign: 'center' }}>{log.module !== 'unknown' ? log.module : ''}</div>
+          ),
+          date: (
+            <div style={{ textAlign: 'center' }}>
+              {moment(log.created_at).format('DD-MM-YYYY, hh:mm:ss A')}
+            </div>
+          ),
+          ip: <div style={{ textAlign: 'center' }}>{log.ip_address}</div>,
         }))
       : []
 
@@ -98,35 +106,44 @@ function userLog() {
     {
       key: 'user',
       label: 'Khách hàng',
-      _props: { scope: 'col', style: { textAlign: 'center' } },
+      _props: {
+        scope: 'col',
+        style: { textAlign: 'center', backgroundColor: '#DEDDF7', cursor: 'pointer' },
+      },
     },
 
     {
       key: 'link',
       label: 'Link',
-      _props: { scope: 'col', style: { textAlign: 'center', width: '30%' } },
+      _props: {
+        scope: 'col',
+        style: { textAlign: 'center', width: '30%', backgroundColor: '#DEDDF7', cursor: 'pointer' },
+      },
     },
 
     {
       key: 'module',
       label: 'Module',
-      _props: { scope: 'col', style: { textAlign: 'center' } },
-    },
-
-    {
-      key: 'action',
-      label: 'Action',
-      _props: { scope: 'col', style: { textAlign: 'center' } },
+      _props: {
+        scope: 'col',
+        style: { textAlign: 'center', backgroundColor: '#DEDDF7', cursor: 'pointer' },
+      },
     },
     {
       key: 'date',
       label: 'Ngày truy cập',
-      _props: { scope: 'col', style: { textAlign: 'center' } },
+      _props: {
+        scope: 'col',
+        style: { textAlign: 'center', backgroundColor: '#DEDDF7', cursor: 'pointer' },
+      },
     },
     {
       key: 'ip',
       label: 'Địa chỉ IP',
-      _props: { scope: 'col', style: { textAlign: 'center' } },
+      _props: {
+        scope: 'col',
+        style: { textAlign: 'center', backgroundColor: '#DEDDF7', cursor: 'pointer' },
+      },
     },
   ]
 
